@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DED23AFE-39CC-4C4D-956D-40CBA718E9A1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MiniSqlParser</RootNamespace>
+    <AssemblyName>MiniSqlParser</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>0</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>abcdefg.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr4.Runtime.Standard, Version=4.7.1.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Parser\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assignment.cs" />
+    <Compile Include="Assignments.cs" />
+    <Compile Include="BestCaseDictionary.cs" />
+    <Compile Include="Parser\MiniSqlParserBaseListener.cs" />
+    <Compile Include="Parser\MiniSqlParserLexer.cs" />
+    <Compile Include="Parser\MiniSqlParserListener.cs" />
+    <Compile Include="Parser\MiniSqlParserParser.cs" />
+    <Compile Include="Visitors\ClonePlaceHoldersVisitor.cs" />
+    <Compile Include="ColumnNames.cs" />
+    <Compile Include="Enums\CompoundType.cs" />
+    <Compile Include="Enums\DateTimeField.cs" />
+    <Compile Include="Enums\DBMSType.cs" />
+    <Compile Include="Enums\ExpOperator.cs" />
+    <Compile Include="Enums\FromSourceType.cs" />
+    <Compile Include="Enums\JoinType.cs" />
+    <Compile Include="Enums\LikeOperator.cs" />
+    <Compile Include="Enums\PredicateOperator.cs" />
+    <Compile Include="Enums\QuantifierType.cs" />
+    <Compile Include="Enums\NullOrder.cs" />
+    <Compile Include="Enums\OrderSpec.cs" />
+    <Compile Include="Enums\QueryType.cs" />
+    <Compile Include="Enums\Sign.cs" />
+    <Compile Include="Enums\StmtType.cs" />
+    <Compile Include="Enums\ConflictType.cs" />
+    <Compile Include="Enums\QueryQuantifier.cs" />
+    <Compile Include="Enums\WaitType.cs" />
+    <Compile Include="Enums\LimitClauseType.cs" />
+    <Compile Include="Enums\FetchRowCountType.cs" />
+    <Compile Include="Exceptions\InvalidASTStructureError.cs" />
+    <Compile Include="Exprs\SubQueryExp.cs" />
+    <Compile Include="ForUpdateClause.cs" />
+    <Compile Include="ForUpdateOfClause.cs" />
+    <Compile Include="FromSources\CommaJoinSource.cs" />
+    <Compile Include="GroupBy.cs" />
+    <Compile Include="Identifier.cs" />
+    <Compile Include="LimitClauses\ILimitClause.cs" />
+    <Compile Include="LimitClauses\LimitClause.cs" />
+    <Compile Include="MergeInsertClause.cs" />
+    <Compile Include="MergeUpdateClause.cs" />
+    <Compile Include="LimitClauses\OffsetFetchClause.cs" />
+    <Compile Include="Parser\CumulativeLexerErrorListener.cs" />
+    <Compile Include="Predicates\BetweenPredicate.cs" />
+    <Compile Include="Predicates\BracketedPredicate.cs" />
+    <Compile Include="Predicates\CollatePredicate.cs" />
+    <Compile Include="Predicates\ExistsPredicte.cs" />
+    <Compile Include="Predicates\InPredicate.cs" />
+    <Compile Include="Predicates\IsNullPredicate.cs" />
+    <Compile Include="Predicates\IsPredicate.cs" />
+    <Compile Include="Predicates\LikePredicate.cs" />
+    <Compile Include="Predicates\PlaceHolderPredicate.cs" />
+    <Compile Include="Predicates\SubQueryPredicate.cs" />
+    <Compile Include="Queries\BracketedQuery.cs" />
+    <Compile Include="Queries\BracketedQueryClause.cs" />
+    <Compile Include="Queries\CompoundQueryClause.cs" />
+    <Compile Include="Queries\IQueryClause.cs" />
+    <Compile Include="Statements\CallStmt.cs" />
+    <Compile Include="Statements\DeleteStmt.cs" />
+    <Compile Include="Statements\MergeStmt.cs" />
+    <Compile Include="Statements\SqlitePragmaStmt.cs" />
+    <Compile Include="Statements\TruncateStmt.cs" />
+    <Compile Include="UnqualifiedColumnNames.cs" />
+    <Compile Include="Comments.cs" />
+    <Compile Include="Exceptions\CannotBuildASTException.cs" />
+    <Compile Include="Exceptions\CannotStringifierException.cs" />
+    <Compile Include="Exceptions\SqlSyntaxErrorsException.cs" />
+    <Compile Include="Exprs\Exprs.cs" />
+    <Compile Include="MiniSqlParserAST.cs" />
+    <Compile Include="IValue.cs" />
+    <Compile Include="NodeCollections.cs" />
+    <Compile Include="Parser\MakeASTListener_Util.cs" />
+    <Compile Include="Parser\MakeASTListener_Predicate.cs" />
+    <Compile Include="Parser\MakeASTListener_Expr.cs" />
+    <Compile Include="ResultColumns\ResultColumns.cs" />
+    <Compile Include="Statements\IfStmt.cs" />
+    <Compile Include="Statements\InsertSelectStmt.cs" />
+    <Compile Include="Statements\InsertStmt.cs" />
+    <Compile Include="Queries\CompoundQuery.cs" />
+    <Compile Include="Default.cs" />
+    <Compile Include="Exprs\WindowFuncExpr.cs" />
+    <Compile Include="FromSources\BracketedSource.cs" />
+    <Compile Include="FromSources\IFromSource.cs" />
+    <Compile Include="FromSources\JoinSource.cs" />
+    <Compile Include="FromSources\JoinOperator.cs" />
+    <Compile Include="FromSources\AliasedQuery.cs" />
+    <Compile Include="Parser\MakeASTListener.cs" />
+    <Compile Include="Exprs\AggregateFuncExpr.cs" />
+    <Compile Include="Exprs\BitwiseNotExpr.cs" />
+    <Compile Include="Exprs\BracketedExpr.cs" />
+    <Compile Include="Exprs\CaseExpr.cs" />
+    <Compile Include="Exprs\CastExpr.cs" />
+    <Compile Include="Exprs\Column.cs" />
+    <Compile Include="Exprs\BinaryOpExpr.cs" />
+    <Compile Include="Exprs\ExtractFuncExpr.cs" />
+    <Compile Include="Exprs\FuncExpr.cs" />
+    <Compile Include="Exprs\Literals\BlobLiteral.cs" />
+    <Compile Include="Exprs\Literals\DateLiteral.cs" />
+    <Compile Include="Exprs\Literals\IntervalLiteral.cs" />
+    <Compile Include="Exprs\Literals\Literal.cs" />
+    <Compile Include="Exprs\Literals\NullLiteral.cs" />
+    <Compile Include="Exprs\Literals\StringLiteral.cs" />
+    <Compile Include="Exprs\Literals\TimeLiteral.cs" />
+    <Compile Include="Exprs\Literals\TimeStampLiteral.cs" />
+    <Compile Include="Exprs\Literals\UNumericLiteral.cs" />
+    <Compile Include="Exprs\PlaceHolderExpr.cs" />
+    <Compile Include="Exprs\SignedNumberExpr.cs" />
+    <Compile Include="Exprs\SubstringFunc.cs" />
+    <Compile Include="OrderBy.cs" />
+    <Compile Include="OrderingTerm.cs" />
+    <Compile Include="PartitionBy.cs" />
+    <Compile Include="PartitioningTerm.cs" />
+    <Compile Include="Predicates\Predicate.cs" />
+    <Compile Include="Predicates\NotPredicate.cs" />
+    <Compile Include="Parser\CumulativeErrorListener.cs" />
+    <Compile Include="Queries\SingleQuery.cs" />
+    <Compile Include="Queries\IQuery.cs" />
+    <Compile Include="Queries\SingleQueryClause.cs" />
+    <Compile Include="ResultColumns\ResultColumn.cs" />
+    <Compile Include="ResultColumns\ResultExpr.cs" />
+    <Compile Include="Exprs\Expr.cs" />
+    <Compile Include="INode.cs" />
+    <Compile Include="Predicates\BinaryOpPredicate.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FromSources\Table.cs" />
+    <Compile Include="Statements\InsertValuesStmt.cs" />
+    <Compile Include="Statements\NullStmt.cs" />
+    <Compile Include="Statements\SelectStmt.cs" />
+    <Compile Include="Statements\Stmt.cs" />
+    <Compile Include="Statements\Stmts.cs" />
+    <Compile Include="ResultColumns\TableWildcard.cs" />
+    <Compile Include="Statements\UpdateStmt.cs" />
+    <Compile Include="UnqualifiedColumnName.cs" />
+    <Compile Include="Values.cs" />
+    <Compile Include="ValuesList.cs" />
+    <Compile Include="Visitors\AddResultVisitor.cs" />
+    <Compile Include="Visitors\InsertResultVisitor.cs" />
+    <Compile Include="Visitors\BeautifulStringifier.cs" />
+    <Compile Include="Visitors\CompactStringifier.cs" />
+    <Compile Include="Visitors\FindAggregateExprVisitor.cs" />
+    <Compile Include="Visitors\IVisitor.cs" />
+    <Compile Include="Visitors\ReplacePlaceHolders.cs" />
+    <Compile Include="Visitors\SetPlaceHoldersVisitor.cs" />
+    <Compile Include="Visitors\Visitor.cs" />
+    <Compile Include="Predicates\AndPredicate.cs" />
+    <Compile Include="Predicates\OrPredicate.cs" />
+    <Compile Include="WithClause.cs" />
+    <Compile Include="WithDefinition.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="abcdefg.snk" />
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
