@@ -1,0 +1,62 @@
+●SqLite文法からの変更箇所
+✔UPDATEとDELETE文のテーブル名でテーブル別名を定義可能
+✔ドキュメンテーションコメントでのテーブル別名を定義可能
+✔SQL文出力時にコメントも出力する
+  → StringifierVisitorにおいて、ASTの各ノードを文字列として出力するたびに、GetHiddenTokensToRight()からCOMMENTチャンネルから
+     コメントトークンの有無を判定し、存在すれば出力する。判定のためにはASTの各ノードに自身のTokenIndexを保持する必要があるだろう
+✔多言語対応
+✔Window関数対応
+✔Merge文対応
+✔Call文対応
+✔IF文対応
+✔Pragma文をPragma Table_Infoに限定
+✔引数の区切りにASを使う関数への対応(SUBSTRING, EXTRACT)
+✔RIGHT OUTER JOINの追加
+✔FULL OUTER JOINの追加
+✔プレースホルダ対応
+✔TOP句
+
+✔SOME,ANY,ALLを許可
+✔exprの文法を標準的なSQLに変更する(a = b > c のような記述を禁止する)
+
+✔IDENTIFIERのエスケープ文字[],"",''のうち[],''を禁止する
+✔数値リテラルに16進数表記を追加
+✔数値リテラルの末尾に浮動小数点型を示すD,FのSuffixを許可
+✔文字列リテラルの先頭にNのPrefixを許可
+文字列リテラルにQストリングを許可
+ただし、任意文字を区切り文字に指定したQストリングは未実装
+日付、時刻、タイムスタンプリテラルの許可
+
+✔IDENTIFIERからSTRING_LITERALを禁止する
+✔IDENTIFIERを()で囲むのを禁止する
+✔IDENTIFIERから''でエスケープする書式を禁止する
+
+AND,OR,NOT以外の演算子の優先順位はDBMS毎に異なるが、
+AND,OR,NOT以外の演算子が、複数連続する記述はできないので(x>y>zのような記述はSQLではできない※)
+実質的な演算子の優先順位に差異はない
+
+※ただしSQLiteでは記述できるが、SqlBuilderの文法では実装をシンプルにするため許可しない
+
+✔サブクエリをExpressionに含める
+
+✔DEFAULTキーワードを許可
+
+✔SELECT句の'*'を1つに限定
+
+With Recursiveを許可するか否か?
+
+✔Select文のFor Update
+
+✔With句はサブクエリに記述することを禁止する
+
+✔INSERT文のDEFAULT VALUES句は禁止する
+  テーブルカラムが省略されDEFAULT VALUES句が指定されるとAssignmentsの要素数が決定できないため
+
+✔Stmt直前のコメント(HeaderComment)格納
+
+REPLACE文
+
+✔ISNULL、ISNOTNULLを禁止する
+
+✔In演算子の被演算子にTable_Nameを指定することを禁止する
+
