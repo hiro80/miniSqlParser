@@ -14,18 +14,18 @@ SQL文の文法はDBMSによりかなり異なるため、主要DBMSの文法か
 
 ## Usage
     // SQL文の文字列から構文木(Abstract Syntax Tree)を出力します
-    var ast = MiniSqlParserAST.CreateStmts("SELECT col FROM TBL");
+    _var ast = MiniSqlParserAST.CreateStmts("SELECT col FROM TBL");_
 
     // 構文木から整形SQL文を出力するVisitorを生成します
     // このように構文木を走査するVisitorを用意できれば様々な処理を構文木に対して行えます
     // (BeautifulStringifierクラスはminiSqlParserにサンプルとして含めています)
-    var stringifier = new BeautifulStringifier(4098);
+    _var stringifier = new BeautifulStringifier(4098);_
 
     // Visitorに構文木を走査させます
-    ast.Accept(stringifier);
+    _ast.Accept(stringifier);_
 
     // 操作し終えたVisitorから結果(整形後のSQL文)を取得します
-    string formattedSql = stringifier.ToString();
+    _string formattedSql = stringifier.ToString();_
 
 ## Requirement
 * Antlr4.Runtime.Standard 4.7.1
