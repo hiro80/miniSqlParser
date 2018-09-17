@@ -228,18 +228,23 @@ namespace MiniSqlParser
       }
     }
 
-    private void DeleteString(int length) {
-      if(length > _sql.Length) {
+    // 削除対象のSQL文字列を末尾から走査し指定文字cがあれば
+    // 末尾からcまでの空白/改行文字も含め削除する
+    private void RemoveTailCharIf(char c) {
+      if(_sql.Length == 0) {
         return;
       }
-      //// 削除対象の文字列に改行が含まれている場合は削除処理を中断する
-      //for(var i = 0; i < length; ++i) {
-      //  var index = _sql.Length - i - 1;
-      //  if(_newline.Contains(_sql[index].ToString())) {
-      //    return;
-      //  }
-      //}
-      _sql.Remove(_sql.Length - length - 1, length);
+
+      int i = _sql.Length -1;
+      int j = 0;
+      while(char.IsWhiteSpace(_sql[i])) {
+        --i;
+        ++j;
+      }
+      
+      if(_sql[i] == c) {
+        _sql.Remove(i, j + 1);
+      }
     }
 
     public override void VisitOnSeparator(Node node, int offset, int i) {
@@ -1479,7 +1484,7 @@ namespace MiniSqlParser
     public override void VisitOnValues(InsertValuesStmt insertValuesStmt, int offset) {
       if(insertValuesStmt.HasTableColumns) {
         // INSERT-VALUES文のVALUESの両端に括弧を配置する
-        this.DeleteString(2);
+        this.RemoveTailCharIf(')');
         this.AppendNewLine();
         this.AppendSymbol(")");
       } else {
