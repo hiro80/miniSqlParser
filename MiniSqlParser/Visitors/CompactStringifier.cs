@@ -84,6 +84,11 @@ namespace MiniSqlParser
       this.AppendComment(commaJoinSource.Comments[offset + i]);
     }
 
+    public override void VisitOnSeparator(ValuesList valuesList, int offset, int i) {
+      this.AppendSymbol(",");
+      this.AppendComment(valuesList.Comments[offset + i]);
+    }
+
     public override void VisitOnSeparator(SubstringFunc expr, int offset, int i) {
       if(i == 0) {
         if(expr.Separator1IsComma) {
