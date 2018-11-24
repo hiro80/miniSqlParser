@@ -9,7 +9,7 @@ miniSqlParserは.NETのアセンブリファイル(DLLファイル)です。C#�
 SQL文の文法はDBMSによりかなり異なるため、主要DBMSの文法から共通的、かつ一般に用いられている部分を抜き出した文法を解析対象としています。
 
 ## Demo
-[ここ](http://www.minisqlparser.net/ "SQL Formatter")で公開しているSQL整形WebアプリでminiSqlParserを使用しています。
+[SQL Formatter](http://www.minisqlparser.net/ "SQL Formatter")で公開しているSQL整形WebアプリでminiSqlParserを使用しています。
 ![Alt text](SQLFormatter_Demo.jpg)
 
 ## Usage
