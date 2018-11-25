@@ -1728,7 +1728,15 @@ namespace MiniSqlParser
     }
 
     public override void VisitOnValues(MergeInsertClause insertClause, int offset) {
-      this.AppendKeyword(" VALUES");
+      if(insertClause.HasTableColumns) {
+        // INSERT-VALUES文のVALUESの両端に括弧を配置する
+        this.RemoveTailCharIf(')');
+        this.AppendNewLine();
+        this.AppendSymbol(")");
+      } else {
+        this.AppendNewLine();
+      }
+      this.AppendKeyword("VALUES");
       this.AppendComment(insertClause.Comments[offset]);
     }
 
