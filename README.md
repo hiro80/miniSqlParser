@@ -1,5 +1,5 @@
 # miniSqlParser
-a simple SQL Parser, that can convert sql string to an abstract syntax tree.
+a simple SQL Parser, that can convert sql statements to an abstract syntax tree.
 
 ## Description
 C#で作成したシンプルなSQL構文解析器です。SQL文を解析して構文木を生成します。SELECT・INSERT・UPDATE・DELETEなどの基本的なSQL文に対応しています。生成した構文木をから整形したSQL文を出力したり、SQL文の変更などなどを行うことができます。
@@ -9,7 +9,7 @@ miniSqlParserは.NETのアセンブリファイル(DLLファイル)です。C#�
 SQL文の文法はDBMSによりかなり異なるため、主要DBMSの文法から共通的、かつ一般に用いられている部分を抜き出した文法を解析対象としています。
 
 ## Demo
-[ここ](http://www.minisqlparser.net/ "SQL Formatter")で公開しているSQL整形WebアプリでminiSqlParserを使用しています。
+[SQL Formatter](http://www.minisqlparser.net/ "SQL Formatter")で公開しているSQL整形WebアプリでminiSqlParserを使用しています。
 ![Alt text](SQLFormatter_Demo.jpg)
 
 ## Usage
