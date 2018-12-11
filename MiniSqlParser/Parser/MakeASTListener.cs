@@ -363,7 +363,22 @@ namespace MiniSqlParser
         updateBeforeInsert = false;
       }
 
-      Predicate constraint = (Predicate)_stack.Pop();
+      Predicate constraint = null;
+      if(context.p != null) {
+        // MS SQL Server
+        constraint = (Predicate)_stack.Pop();
+      } else {
+        // Oracle
+
+        // ON句の括弧はBracketedPredicateで表現する
+        // MergeStmtのコメントをBracketedPredicateに移す
+        var constraintComments = new Comments();
+        constraintComments.Add(comments[4]);
+        constraintComments.Add(comments[5]);
+        comments.RemoveAt(4);
+        comments.RemoveAt(4);
+        constraint = new BracketedPredicate((Predicate)_stack.Pop(), constraintComments);
+      }
 
       Table usingTable = null;
       AliasedQuery usingQuery = null;

@@ -84,6 +84,11 @@ namespace MiniSqlParser
       this.AppendComment(commaJoinSource.Comments[offset + i]);
     }
 
+    public override void VisitOnSeparator(ValuesList valuesList, int offset, int i) {
+      this.AppendSymbol(",");
+      this.AppendComment(valuesList.Comments[offset + i]);
+    }
+
     public override void VisitOnSeparator(SubstringFunc expr, int offset, int i) {
       if(i == 0) {
         if(expr.Separator1IsComma) {
@@ -579,6 +584,8 @@ namespace MiniSqlParser
 
       if(predicate.Operator == LikeOperator.Like) {
         this.AppendKeyword(" LIKE");
+      } else if(predicate.Operator == LikeOperator.Ilike) {
+        this.AppendKeyword(" ILIKE");
       } else if(predicate.Operator == LikeOperator.Glog) {
         this.AppendKeyword(" GLOB");
       } else if(predicate.Operator == LikeOperator.Match) {

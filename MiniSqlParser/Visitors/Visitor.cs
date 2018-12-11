@@ -8,6 +8,7 @@ namespace MiniSqlParser
     virtual public void VisitOnSeparator(Node node, int offset, int i) { }
     virtual public void VisitOnSeparator(Exprs exprs, int offset, int i) { }
     virtual public void VisitOnSeparator(CommaJoinSource commaJoinSource, int offset, int i) { }
+    virtual public void VisitOnSeparator(ValuesList valuesList, int offset, int i) { }
     virtual public void VisitOnSeparator(SubstringFunc expr, int offset, int i) { }
     virtual public void VisitOnSeparator(ExtractFuncExpr expr, int offset) { }
     virtual public void VisitOnLParen(Node node, int offset) { }

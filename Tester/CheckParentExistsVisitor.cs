@@ -746,6 +746,10 @@ namespace Tester
       this.ParentExists(commaJoinSource);
     }
 
+    void IVisitor.VisitOnSeparator(ValuesList valuesList, int offset, int i) {
+      this.ParentExists(valuesList);
+    }
+
     void IVisitor.VisitOnSeparator(Node node, int offset, int i) {
       this.ParentExists(node);
     }

@@ -87,6 +87,8 @@ namespace MiniSqlParser
       LikeOperator op = LikeOperator.Like;
       if(opType == MiniSqlParserLexer.K_LIKE) {
         op = LikeOperator.Like;
+      } else if(opType == MiniSqlParserLexer.K_ILIKE) {
+        op = LikeOperator.Ilike;
       } else if(opType == MiniSqlParserLexer.K_GLOB) {
         op = LikeOperator.Glog;
       } else if(opType == MiniSqlParserLexer.K_MATCH) {

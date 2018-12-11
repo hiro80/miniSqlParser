@@ -153,11 +153,11 @@ namespace MiniSqlParser
 
       visitor.VisitOnOn(this, offset);
       offset += 1;
-      visitor.VisitOnLParen(this, offset);
-      offset += 1;
+      //visitor.VisitOnLParen(this, offset);
+      //offset += 1;
       this.Constraint.Accept(visitor);
-      visitor.VisitOnRParen(this, offset);
-      offset += 1;
+      //visitor.VisitOnRParen(this, offset);
+      //offset += 1;
 
       if(this.UpdateBeforeInsert) {
         this.UpdateClause.Accept(visitor);

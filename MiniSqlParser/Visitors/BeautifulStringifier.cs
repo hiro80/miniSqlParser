@@ -38,12 +38,15 @@ namespace MiniSqlParser
       public int StmtStartPos;
       public int AndorFirstOperand;
       public int AndorNestLevel;
+      public int JoinNestLevel;
       public StmtIndentInfo(int stmtStartPos
                           , int andorFirstOperand = 0
-                          , int andorNestLevel = 0) {
+                          , int andorNestLevel = 0
+                          , int joinNestLevel = 0) {
         this.StmtStartPos = stmtStartPos;
         this.AndorFirstOperand = andorFirstOperand;
         this.AndorNestLevel = andorNestLevel;
+        this.JoinNestLevel = joinNestLevel;
       }
     }
 
@@ -65,10 +68,6 @@ namespace MiniSqlParser
 
     // AND/OR演算子の最初の被演算子のインデント
     private readonly string m_andorFirstOperandIndent;
-
-    // AND/OR演算子の最初の被演算子のインデント
-    // (被演算子がBracketedPredicateの場合は括弧1文字分差し引く)
-    private readonly string m_andorFirstOperandIndent2;
 
     // AND/ORの左被演算子内における改行後のインデント
     private readonly string m_andorLeftOperandIndent;
@@ -136,7 +135,6 @@ namespace MiniSqlParser
       m_indentSpaces2 = new string(' ', m_indentSize-1);
       m_andorNestLevelIndent = new string(' ', 4);
       m_andorFirstOperandIndent = new string(' ', 4);
-      m_andorFirstOperandIndent2 = new string(' ', 4 - 1);
       m_andorLeftOperandIndent = new string(' ', 4);
       m_joinFirstOperandIndent = new string(' ', 5);
 
@@ -165,7 +163,7 @@ namespace MiniSqlParser
       }
     }
 
-    // SQL文の先頭コメントがC言語コメントの場合は、まつびで改行する
+    // SQL文の先頭コメントがC言語コメントの場合は、末尾で改行する
     private void AppendHeaderComment(string str) {
       if(!_printComments || str == null) {
         return;
@@ -262,6 +260,11 @@ namespace MiniSqlParser
     public override void VisitOnSeparator(CommaJoinSource commaJoinSource, int offset, int i) {
       this.AppendSymbol(",");
       this.AppendComment(commaJoinSource.Comments[offset + i]);
+    }
+
+    public override void VisitOnSeparator(ValuesList valuesList, int offset, int i) {
+      this.AppendSymbol(",");
+      this.AppendComment(valuesList.Comments[offset + i]);
     }
 
     public override void VisitOnSeparator(SubstringFunc expr, int offset, int i) {
@@ -788,6 +791,8 @@ namespace MiniSqlParser
 
       if(predicate.Operator == LikeOperator.Like) {
         this.AppendKeyword(" LIKE");
+      } else if(predicate.Operator == LikeOperator.Ilike) {
+        this.AppendKeyword(" ILIKE");
       } else if(predicate.Operator == LikeOperator.Glog) {
         this.AppendKeyword(" GLOB");
       } else if(predicate.Operator == LikeOperator.Match) {
@@ -1111,15 +1116,6 @@ namespace MiniSqlParser
         this.AppendComment(query.Comments[offset]);
         // FROMキーワードの直後に改行しない
         this.AppendString(" ");
-      } else if(_joinIndent == JoinIndentType.B &&
-                query.From.GetType() == typeof(JoinSource)) {
-        this.AppendNewLine();
-        this.AppendKeyword("FROM");
-        this.AppendComment(query.Comments[offset]);
-        this.AppendNewLine();
-        this.AppendString(m_indentSpaces);
-        // Table Sourceが2つ以上在れば、最初のTable Sourceを右に寄せる
-        this.AppendString(m_joinFirstOperandIndent);
       } else {
         this.AppendNewLine();
         this.AppendKeyword("FROM");
@@ -1133,8 +1129,13 @@ namespace MiniSqlParser
       this.AppendNewLine();
       this.AppendKeyword("WHERE");
       this.AppendComment(query.Comments[offset]);
-      this.AppendNewLine();
-      this.AppendString(m_indentSpaces);
+      if(m_indentSize > 1) {
+        var spaces = m_indentSize - 1;
+        this.AppendString(new string(' ', spaces));
+      } else {
+        this.AppendNewLine();
+        this.AppendString(m_indentSpaces);
+      }
     }
 
     public override void VisitOnHaving(SingleQueryClause query, int offset) {
@@ -1239,11 +1240,19 @@ namespace MiniSqlParser
     }
 
     public override void VisitBefore(BracketedSource bracketedSource) {
+      // 括弧の開始位置を保持する
+      _bracketedStartPos.Push(m_currentColumnPos);
+
       this.AppendSymbol("(");
       this.AppendComment(bracketedSource.Comments[0]);
+
+      ++m_bracketNestLevel;
     }
 
     public override void VisitAfter(BracketedSource bracketedSource) {
+      // 括弧の開始位置を戻す
+      _bracketedStartPos.Pop();
+
       var i = 0;
       this.AppendSymbol(")");
       this.AppendComment(bracketedSource.Comments[++i]);
@@ -1259,13 +1268,19 @@ namespace MiniSqlParser
         this.AppendComment(bracketedSource.Comments[++i]);
         this.AppendString(" ");
       }
+
+      --m_bracketNestLevel;
     }
 
     public override void Visit(JoinOperator joinOperator) {
+      // Rignt Nodeの走査前にNestレベルを上げる
+      ++m_stmtStartPos.Peek().JoinNestLevel;
+
       if(joinOperator.HasNaturalKeyword ||
          joinOperator.JoinType != JoinType.None) {
         this.AppendNewLine();
         this.AppendString(m_indentSpaces);
+        this.AppendBracketedSourceNestLevelSpaces();
       }
       var i = -1;
       if(joinOperator.HasNaturalKeyword) {
@@ -1303,10 +1318,12 @@ namespace MiniSqlParser
         } else {
           this.AppendNewLine();
           this.AppendString(m_indentSpaces);
+          this.AppendBracketedSourceNestLevelSpaces();
         }
       } else if(_joinIndent == JoinIndentType.B) {
         this.AppendNewLine();
         this.AppendString(m_indentSpaces);
+        this.AppendBracketedSourceNestLevelSpaces();
       }
 
       this.AppendKeyword("JOIN");
@@ -1318,12 +1335,25 @@ namespace MiniSqlParser
       if(joinSource.HasConstraint) {
         this.AppendNewLine();
         this.AppendString(m_indentSpaces);
+        this.AppendBracketedSourceNestLevelSpaces();
         this.AppendKeyword("ON");
         this.AppendComment(joinSource.Comments[0]);
         this.AppendString("  ");
       } else if(joinSource.HasUsingConstraint) {
         this.AppendKeyword(" USING");
         this.AppendComment(joinSource.Comments[0]);
+      }
+    }
+    private void AppendBracketedSourceNestLevelSpaces() {
+      // 上段に"JOIN ("があればその文字列幅だけインデントする
+      if(m_stmtStartPos.Peek().JoinNestLevel >= 1 && _bracketedStartPos.Count > 0) {
+        var spaces = _bracketedStartPos.Peek() - m_currentColumnPos + 1;
+        if(spaces > 0) {
+          this.AppendString(new string(' ', spaces));
+        }
+      } else if(m_bracketNestLevel > 0) {
+        // 括弧内であればその括弧分の空白文字を挿入する
+        this.AppendString(" ");
       }
     }
 
@@ -1440,8 +1470,13 @@ namespace MiniSqlParser
       this.AppendNewLine();
       this.AppendKeyword("WHERE");
       this.AppendComment(updateStmt.Comments[offset]);
-      this.AppendNewLine();
-      this.AppendString(m_indentSpaces);
+      if(m_indentSize > 1) {
+        var spaces = m_indentSize - 1;
+        this.AppendString(new string(' ', spaces));
+      } else {
+        this.AppendNewLine();
+        this.AppendString(m_indentSpaces);
+      }
     }
 
     public override void VisitAfter(UpdateStmt updateStmt) {
@@ -1495,6 +1530,12 @@ namespace MiniSqlParser
     }
 
     public override void VisitBeforeQuery(InsertSelectStmt insertSelectStmt, int offset) {
+      if(insertSelectStmt.HasTableColumns) {
+        // INSERT-SELECT文のテーブル列指定の閉括弧の前に改行する
+        this.RemoveTailCharIf(')');
+        this.AppendNewLine();
+        this.AppendSymbol(")");
+      }
       this.AppendNewLine();
     }
 
@@ -1596,8 +1637,13 @@ namespace MiniSqlParser
       this.AppendNewLine();
       this.AppendKeyword("WHERE");
       this.AppendComment(deleteStmt.Comments[offset]);
-      this.AppendNewLine();
-      this.AppendString(m_indentSpaces);
+      if(m_indentSize > 1) {
+        var spaces = m_indentSize - 1;
+        this.AppendString(new string(' ', spaces));
+      } else {
+        this.AppendNewLine();
+        this.AppendString(m_indentSpaces);
+      }
     }
 
     public override void VisitAfter(DeleteStmt deleteStmt) {
@@ -1635,7 +1681,7 @@ namespace MiniSqlParser
       this.AppendNewLine();
       this.AppendKeyword("ON");
       this.AppendComment(mergeStmt.Comments[offset]);
-      this.AppendString(" ");
+      this.AppendString("  ");
     }
 
     public override void VisitAfter(MergeStmt mergeStmt) { 
@@ -1684,7 +1730,15 @@ namespace MiniSqlParser
     }
 
     public override void VisitOnValues(MergeInsertClause insertClause, int offset) {
-      this.AppendKeyword(" VALUES");
+      if(insertClause.HasTableColumns) {
+        // INSERT-VALUES文のVALUESの両端に括弧を配置する
+        this.RemoveTailCharIf(')');
+        this.AppendNewLine();
+        this.AppendSymbol(")");
+      } else {
+        this.AppendNewLine();
+      }
+      this.AppendKeyword("VALUES");
       this.AppendComment(insertClause.Comments[offset]);
     }
 
@@ -1889,7 +1943,12 @@ namespace MiniSqlParser
          andPredicate.Left.GetType() != typeof(OrPredicate) ) {
         if(this.GetAncestorOfPredicate(andPredicate).GetType() != typeof(JoinSource)){
           // 直前に開き括弧を出力した場合は、インデントしない
-          if(_lastAppendToken != "(" || andPredicate.Left.GetType() != typeof(BracketedPredicate)) {
+          if(_lastAppendToken != "(") {
+            // WHERE句の直後に改行を入れる場合は、インデントする
+            if(m_indentSize < 2) {
+              this.AppendString(m_andorFirstOperandIndent);
+            }            
+          }else if(andPredicate.Left.GetType() != typeof(BracketedPredicate)) {
             this.AppendString(m_andorFirstOperandIndent);
           }
         }
@@ -1907,8 +1966,13 @@ namespace MiniSqlParser
       this.AppendNewLine();
       this.AppendString(m_indentSpaces);
 
+      // WHERE句の後に改行を入れるか否か
+      int linebreakAfterWhere = m_indentSize < 2 ? 1 : 0;
+
       // 上段に"AND ("があればその文字列幅だけインデントする
-      if(m_stmtStartPos.Peek().AndorNestLevel - (m_queryNestLevel - 1) > 0 &&
+      //if(m_stmtStartPos.Peek().AndorNestLevel - (m_queryNestLevel - 1) >= linebreakAfterWhere &&
+      //   _bracketedStartPos.Count > 0) {
+      if(m_stmtStartPos.Peek().AndorNestLevel >= linebreakAfterWhere &&
          _bracketedStartPos.Count > 0) {
         var spaces = _bracketedStartPos.Peek() - m_currentColumnPos + 1;
         if(spaces > 0) {
@@ -1946,7 +2010,12 @@ namespace MiniSqlParser
          orPredicate.Left.GetType() != typeof(OrPredicate)  ) {
         if(this.GetAncestorOfPredicate(orPredicate).GetType() != typeof(JoinSource)) {
           // 直前に開き括弧を出力した場合は、インデントしない
-          if(_lastAppendToken != "(" || orPredicate.Left.GetType() != typeof(BracketedPredicate)) {
+          if(_lastAppendToken != "(") {
+            // WHERE句の直後に改行を入れる場合は、インデントする
+            if(m_indentSize < 2) {
+              this.AppendString(m_andorFirstOperandIndent);
+            }
+          } else if(orPredicate.Left.GetType() != typeof(BracketedPredicate)) {
             this.AppendString(m_andorFirstOperandIndent);
           }
         }
@@ -1964,8 +2033,13 @@ namespace MiniSqlParser
       this.AppendNewLine();
       this.AppendString(m_indentSpaces);
 
+      // WHERE句の後に改行を入れるか否か
+      int linebreakAfterWhere = m_indentSize < 2 ? 1 : 0;
+
       // 上段に"AND ("があればその文字列幅だけインデントする
-      if(m_stmtStartPos.Peek().AndorNestLevel - (m_queryNestLevel - 1) > 0 &&
+      //if(m_stmtStartPos.Peek().AndorNestLevel - (m_queryNestLevel - 1) >= linebreakAfterWhere &&
+      //   _bracketedStartPos.Count > 0) {
+      if(m_stmtStartPos.Peek().AndorNestLevel >= linebreakAfterWhere &&
          _bracketedStartPos.Count > 0) {
         var spaces = _bracketedStartPos.Peek() - m_currentColumnPos + 1;
         if(spaces > 0) {
@@ -2162,11 +2236,29 @@ namespace MiniSqlParser
     public override void VisitBefore(ValuesList valuesList) { }
     public override void VisitAfter(ValuesList valuesList) { }
     public override void VisitBefore(Values values) { }
-    public override void VisitAfter(Values values) { }
+    public override void VisitAfter(Values values) {
+      // INSERT-VALUES文のVALUES句の両端の括弧は一行に配置する
+      this.RemoveTailCharIf(')');
+      this.AppendNewLine();
+      this.AppendSymbol(")");
+    }
     public override void VisitBefore(Exprs exprs) { }
     public override void VisitAfter(Exprs exprs) { }
-    public override void VisitBefore(JoinSource joinSource) { }
-    public override void VisitAfter(JoinSource joinSource) { }
+    public override void VisitBefore(JoinSource joinSource) {
+      // FROM又は左括弧の直後にJOIN式が続く場合は、インデントする
+      if(joinSource.Left.GetType() != typeof(JoinSource)) {
+        // 直前に開き括弧を出力した場合は、インデントしない
+        if(_lastAppendToken != "(") {
+          this.AppendString(m_joinFirstOperandIndent);
+        } else if(joinSource.Left.GetType() != typeof(BracketedPredicate)) {
+          this.AppendString(m_joinFirstOperandIndent);
+        }
+      }
+    }
+    public override void VisitAfter(JoinSource joinSource) {
+      // Rignt Nodeの走査後にNestレベルを下げる
+      --m_stmtStartPos.Peek().JoinNestLevel;
+    }
     public override void VisitBefore(CommaJoinSource commaJoinSource) { }
     public override void VisitAfter(CommaJoinSource commaJoinSource) { }
     public override void VisitAfter(GroupBy groupBy) { }

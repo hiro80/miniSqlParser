@@ -25,6 +25,12 @@ namespace MiniSqlParser
       }
     }
 
+    public bool HasTableColumns {
+      get {
+        return this.Columns != null;
+      }
+    }
+
     internal MergeInsertClause(ColumnNames columns
                               , Values values
                               , Comments comments) {

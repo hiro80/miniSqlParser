@@ -214,7 +214,7 @@ merge_stmt
  : with_clause? 
    K_MERGE K_INTO aliased_table_name
    K_USING ( aliased_table_name | aliased_query )
-   K_ON '(' predicate ')'
+   K_ON ( {IsMsSql}? p=predicate | {IsOracle}? '(' predicate ')' )
    (  primary=  merge_update_clause merge_insert_clause?
     | secondary=merge_insert_clause merge_update_clause?
    )?
@@ -426,11 +426,11 @@ for_update_of_clause
 */
 
 predicate
- : PLACEHOLDER1                                          # PhPredicate
- | PLACEHOLDER2                                          # PhPredicate
+ : PLACEHOLDER1                                         # PhPredicate
+ | PLACEHOLDER2                                         # PhPredicate
  | expr op=( '<' | '<=' | '>'  | '>=' ) expr            # BinaryOpPredicate
  | expr op=( '=' | '==' | '!=' | '<>' ) expr            # BinaryOpPredicate
- | expr K_NOT? op=( K_LIKE | K_GLOB | K_MATCH | K_REGEXP )
+ | expr K_NOT? op=( K_LIKE | K_ILIKE | K_GLOB | K_MATCH | K_REGEXP )
    expr ( K_ESCAPE expr )?                              # LikePredicate
  | expr K_IS K_NOT? K_NULL                              # IsNullPredicate
  | expr K_IS K_NOT? expr                                # IsPredicate
@@ -643,6 +643,7 @@ identifiable_keyword
  | K_HOUR
 /* | K_IF       */
  | K_IGNORE
+ | K_ILIKE
 /* | K_IN       */
  | K_INDEXED
  | K_INNER
@@ -925,6 +926,7 @@ K_HAVING   : H A V I N G;
 K_HOUR     : H O U R;
 K_IF       : I F;
 K_IGNORE   : I G N O R E;
+K_ILIKE    : I L I K E;
 K_IN       : I N;
 K_INDEXED  : I N D E X E D;
 K_INNER    : I N N E R;
