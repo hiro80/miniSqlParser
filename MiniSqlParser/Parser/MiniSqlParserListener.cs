@@ -171,6 +171,16 @@ public interface IMiniSqlParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitInsert_stmt([NotNull] MiniSqlParserParser.Insert_stmtContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.replace_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterReplace_stmt([NotNull] MiniSqlParserParser.Replace_stmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.replace_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitReplace_stmt([NotNull] MiniSqlParserParser.Replace_stmtContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.delete_stmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

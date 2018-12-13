@@ -4,6 +4,7 @@ namespace MiniSqlParser
   public class InsertSelectStmt: InsertStmt
   {
     internal InsertSelectStmt(WithClause with
+                            , bool isReplaceStmt
                             , ConflictType onConflict
                             , bool hasIntoKeyword
                             , Table table
@@ -12,6 +13,7 @@ namespace MiniSqlParser
                             , Comments comments) {
       this.Comments = comments;
       this.With = with;
+      this.IsReplaceStmt = isReplaceStmt;
       this.OnConflict = onConflict;
       this.HasIntoKeyword = hasIntoKeyword;
       this.Table = table;

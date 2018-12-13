@@ -1064,7 +1064,11 @@ namespace MiniSqlParser
 
     public override void VisitOnInsert(InsertStmt insertStmt) {
       var i = -1;
-      this.AppendKeyword("INSERT");
+      if(insertStmt.IsReplaceStmt) {
+        this.AppendKeyword("REPLACE");
+      } else {
+        this.AppendKeyword("INSERT");
+      }
       this.AppendComment(insertStmt.Comments[++i]);
       this.AppendString(" ");
 

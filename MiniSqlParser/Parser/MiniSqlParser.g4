@@ -153,6 +153,8 @@ stmt_sub
  : select_stmt
  | update_stmt
  | insert_stmt
+ | {IsMySql || IsSQLite}?
+   replace_stmt
  | delete_stmt
  | {IsOracle || IsMsSql}?
    merge_stmt
@@ -191,12 +193,17 @@ update_stmt
 insert_stmt
  : with_clause? 
   (              K_INSERT                 K_INTO?
-   | {IsSQLite}? K_REPLACE                K_INTO?
    | {IsSQLite}? K_INSERT K_OR K_REPLACE  K_INTO
    | {IsSQLite}? K_INSERT K_OR K_ROLLBACK K_INTO
    | {IsSQLite}? K_INSERT K_OR K_ABORT    K_INTO
    | {IsSQLite}? K_INSERT K_OR K_FAIL     K_INTO
    | {IsSQLite}? K_INSERT K_OR K_IGNORE   K_INTO )
+   table_name unqualified_column_names?
+   ( K_VALUES values_clauses | query /*| K_DEFAULT K_VALUES*/ )
+ ;
+
+replace_stmt
+ : with_clause? K_REPLACE K_INTO?
    table_name unqualified_column_names?
    ( K_VALUES values_clauses | query /*| K_DEFAULT K_VALUES*/ )
  ;

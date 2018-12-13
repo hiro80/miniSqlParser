@@ -14,6 +14,7 @@ namespace MiniSqlParser
       }
     }
 
+    virtual public bool IsReplaceStmt { get; protected set; }
     virtual public ConflictType OnConflict { get; protected set; }
     virtual public bool HasIntoKeyword { get; protected set; }
 

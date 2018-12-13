@@ -203,6 +203,18 @@ public partial class MiniSqlParserBaseListener : IMiniSqlParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitInsert_stmt([NotNull] MiniSqlParserParser.Insert_stmtContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.replace_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterReplace_stmt([NotNull] MiniSqlParserParser.Replace_stmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.replace_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitReplace_stmt([NotNull] MiniSqlParserParser.Replace_stmtContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.delete_stmt"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

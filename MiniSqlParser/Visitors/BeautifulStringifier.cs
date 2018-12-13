@@ -1497,7 +1497,11 @@ namespace MiniSqlParser
       ++m_queryNestLevel;
 
       var i = -1;
-      this.AppendKeyword("INSERT");
+      if(insertStmt.IsReplaceStmt) {
+        this.AppendKeyword("REPLACE");
+      } else {
+        this.AppendKeyword("INSERT");
+      }
       this.AppendComment(insertStmt.Comments[++i]);
       this.AppendString(" ");
 

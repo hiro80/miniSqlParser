@@ -176,6 +176,7 @@ namespace MiniSqlParser
 
       if(context.K_VALUES() != null) {
         var node = new InsertValuesStmt(withNode
+                                      , false
                                       , onConflict
                                       , hasIntoKeyword
                                       , tableNode
@@ -188,6 +189,7 @@ namespace MiniSqlParser
         _stack.Push(node);
       } else {
         var node = new InsertSelectStmt(withNode
+                                      , false
                                       , onConflict
                                       , hasIntoKeyword
                                       , tableNode
@@ -224,6 +226,76 @@ namespace MiniSqlParser
       }
       var node = new Values(values, comments);
       _stack.Push(node);
+    }
+
+    public override void ExitReplace_stmt(MiniSqlParserParser.Replace_stmtContext context) {
+      var comments = this.GetComments(context);
+      var hasIntoKeyword = context.K_INTO() != null;
+      var hasColumnNames = context.unqualified_column_names() != null;
+
+      if(this.ForSqlAccessor && !hasIntoKeyword) {
+        this.AddSqlAccessorSyntaxError("SqlPodではREPLACE文のINTOキーワードを省略できません", context);
+      }
+
+      if(this.ForSqlAccessor && !hasColumnNames) {
+        this.AddSqlAccessorSyntaxError("SqlPodではREPLACE文のテーブル列名の指定を省略できません", context);
+      }
+
+      ValuesList valuesList = null;
+      IQuery query = null;
+      if(context.K_VALUES() != null) {
+        valuesList = (ValuesList)_stack.Pop();
+      } else if(context.query() != null) {
+        query = (IQuery)_stack.Pop();
+      } else {
+        throw new CannotBuildASTException("Either values clause or select clause are not used");
+      }
+
+      UnqualifiedColumnNames columns = null;
+      if(hasColumnNames) {
+        columns = (UnqualifiedColumnNames)_stack.Pop();
+      }
+
+      var tableNode = (Table)_stack.Pop();
+      // コメントでテーブル別名の指定があれば取得する
+      var implicitAliasName = this.GetTableAliasNameFromDocComment(context.table_name());
+      tableNode.ImplicitAliasName = implicitAliasName;
+
+      ConflictType onConflict = ConflictType.None;
+
+      WithClause withNode = null;
+      if(context.with_clause() != null) {
+        withNode = (WithClause)_stack.Pop();
+      }
+
+      if(context.K_VALUES() != null) {
+        var node = new InsertValuesStmt(withNode
+                                      , true
+                                      , onConflict
+                                      , hasIntoKeyword
+                                      , tableNode
+                                      , columns
+                                      , valuesList
+                                      , comments);
+        // REPLACE-VALUES文の先頭コメント、プレースホルダ初期値を設定する
+        node.HeaderComment = this.GetHeaderComment(context.Start.TokenIndex);
+        node.PlaceHolderAssignComments = this.GetDefaultValuePlaceHolders(context.Start.TokenIndex);
+        _stack.Push(node);
+      } else {
+        var node = new InsertSelectStmt(withNode
+                                      , true
+                                      , onConflict
+                                      , hasIntoKeyword
+                                      , tableNode
+                                      , columns
+                                      , query
+                                      , comments);
+        // REPLACE-SELECT文の先頭コメント、プレースホルダ初期値及びAutoWhere値を設定する
+        node.HeaderComment = this.GetHeaderComment(context.Start.TokenIndex);
+        node.PlaceHolderAssignComments = this.GetDefaultValuePlaceHolders(context.Start.TokenIndex);
+        node.AutoWhere = this.GetHeaderAutoWhere(context.Start.TokenIndex);
+        _stack.Push(node);
+      }
     }
 
     public override void ExitUpdate_stmt(MiniSqlParserParser.Update_stmtContext context) {
