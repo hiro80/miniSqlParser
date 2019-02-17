@@ -1067,6 +1067,20 @@ public partial class MiniSqlParserBaseListener : IMiniSqlParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitGenericFuncExpr([NotNull] MiniSqlParserParser.GenericFuncExprContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>PostgreSqlCastExpr</c>
+	/// labeled alternative in <see cref="MiniSqlParserParser.expr"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPostgreSqlCastExpr([NotNull] MiniSqlParserParser.PostgreSqlCastExprContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PostgreSqlCastExpr</c>
+	/// labeled alternative in <see cref="MiniSqlParserParser.expr"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPostgreSqlCastExpr([NotNull] MiniSqlParserParser.PostgreSqlCastExprContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>SignedNumberExpr</c>
 	/// labeled alternative in <see cref="MiniSqlParserParser.expr"/>.
 	/// <para>The default implementation does nothing.</para>

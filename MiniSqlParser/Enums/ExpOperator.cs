@@ -13,5 +13,10 @@ namespace MiniSqlParser
     ,RightBitShift
     ,BitAnd
     ,BitOr
+    ,GetJsonObj        // ->
+    ,GetJsonObjAsText  // ->>
+    ,GetJsonPath       // #>
+    ,GetJsonPathAsText // #>>
+    ,DelJsonObj        // #-
   }
 }

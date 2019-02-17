@@ -27,6 +27,14 @@ namespace MiniSqlParser
         op = PredicateOperator.Equal2;
       } else if(opType == MiniSqlParserLexer.NOT_EQ1) {
         op = PredicateOperator.NotEqual2;
+      } else if(opType == MiniSqlParserLexer.AT_LT) {
+        op = PredicateOperator.ContainsJsonValueL;
+      } else if(opType == MiniSqlParserLexer.AT_GT) {
+        op = PredicateOperator.ContainsJsonValueR;
+      } else if(opType == MiniSqlParserLexer.QRY_PIPE) {
+        op = PredicateOperator.ExistsJsonValue2;
+      } else if(opType == MiniSqlParserLexer.QRY_AMP) {
+        op = PredicateOperator.ExistsJsonValue3;
       } else {
         throw new CannotBuildASTException("Undifined PredicateOperator is used");
       }

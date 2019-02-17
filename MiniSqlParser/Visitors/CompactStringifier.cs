@@ -331,6 +331,17 @@ namespace MiniSqlParser
         this.AppendSymbol("&");
       } else if(expr.Operator == ExpOperator.BitOr) {
         this.AppendSymbol("|");
+      } else if(expr.Operator == ExpOperator.GetJsonObj) {
+        this.AppendSymbol("->");
+      } else if(expr.Operator == ExpOperator.GetJsonObjAsText) {
+        this.AppendSymbol("->>");
+      } else if(expr.Operator == ExpOperator.GetJsonPath) {
+        // ORACLEでは'#'はIDENTIFIERに含まれるので、空白を付加する
+        this.AppendSymbol(" #>");
+      } else if(expr.Operator == ExpOperator.GetJsonPathAsText) {
+        this.AppendSymbol(" #>>");
+      } else if(expr.Operator == ExpOperator.DelJsonObj) {
+        this.AppendSymbol(" #-");
       } else {
         throw new InvalidEnumArgumentException("Undefined ExpOperator is used"
                                               , (int)expr.Operator
@@ -469,6 +480,9 @@ namespace MiniSqlParser
     }
 
     public override void VisitBefore(CastExpr expr) {
+      if(expr.IsPostgreSqlHistoricalCast) {
+        return;
+      }
       this.AppendKeyword("CAST");
       this.AppendComment(expr.Comments[0]);
       this.AppendSymbol("(");
@@ -476,13 +490,20 @@ namespace MiniSqlParser
     }
 
     public override void VisitAfter(CastExpr expr) {
-      this.AppendKeyword(" AS");
-      this.AppendComment(expr.Comments[2]);
-      this.AppendString(" ");
-      this.AppendString(expr.TypeName);
-      this.AppendComment(expr.Comments[3]);
-      this.AppendSymbol(")");
-      this.AppendComment(expr.Comments[4]);
+      if(expr.IsPostgreSqlHistoricalCast) {
+        this.AppendSymbol("::");
+        this.AppendComment(expr.Comments[0]);
+        this.AppendString(expr.TypeName);
+        this.AppendComment(expr.Comments[1]);
+      } else {
+        this.AppendKeyword(" AS");
+        this.AppendComment(expr.Comments[2]);
+        this.AppendString(" ");
+        this.AppendString(expr.TypeName);
+        this.AppendComment(expr.Comments[3]);
+        this.AppendSymbol(")");
+        this.AppendComment(expr.Comments[4]);
+      }
     }
 
     public override void VisitBefore(CaseExpr expr) {
@@ -543,6 +564,14 @@ namespace MiniSqlParser
         this.AppendSymbol("==");
       } else if(predicate.Operator == PredicateOperator.NotEqual2) {
         this.AppendSymbol("!=");
+      } else if(predicate.Operator == PredicateOperator.ContainsJsonValueL) {
+        this.AppendSymbol("<@");
+      } else if(predicate.Operator == PredicateOperator.ContainsJsonValueR) {
+        this.AppendSymbol("@>");
+      } else if(predicate.Operator == PredicateOperator.ExistsJsonValue2) {
+        this.AppendSymbol("?|");
+      } else if(predicate.Operator == PredicateOperator.ExistsJsonValue3) {
+        this.AppendSymbol("?&");
       } else {
         throw new InvalidEnumArgumentException("Undefined PredicateOperator is used"
                                               , (int)predicate.Operator

@@ -218,6 +218,16 @@ namespace MiniSqlParser
         op = ExpOperator.BitAnd;
       } else if(opType == MiniSqlParserLexer.PIPE) {
         op = ExpOperator.BitOr;
+      } else if(opType == MiniSqlParserLexer.ARROW){
+        op = ExpOperator.GetJsonObj;
+      } else if(opType == MiniSqlParserLexer.ARROW2) {
+        op = ExpOperator.GetJsonObjAsText;
+      } else if(opType == MiniSqlParserLexer.S_GT) {
+        op = ExpOperator.GetJsonPath;
+      } else if(opType == MiniSqlParserLexer.S_GT2) {
+        op = ExpOperator.GetJsonPathAsText;
+      } else if(opType == MiniSqlParserLexer.S_MINUS) {
+        op = ExpOperator.DelJsonObj;
       } else {
         throw new InvalidEnumArgumentException("Undefined ExpOperator is used"
                                               , (int)opType
@@ -308,6 +318,16 @@ namespace MiniSqlParser
       _stack.Push(node);
     }
 
+    public override void ExitPostgreSqlCastExpr(MiniSqlParserParser.PostgreSqlCastExprContext context) {
+      var comments = this.GetComments(context);
+      var typeNameComment = this.GetComments(context.type_name()).Last;
+      comments.Insert(1, typeNameComment);
+      var typeName = context.type_name().GetText();
+      var operand = (Expr)_stack.Pop();
+      var node = new CastExpr(operand, typeName, true, comments);
+      _stack.Push(node);
+    }
+
     public override void ExitBitwiseNotExpr(MiniSqlParserParser.BitwiseNotExprContext context) {
       var comments = this.GetComments(context);
       var operand = (Expr)_stack.Pop();
@@ -379,8 +399,7 @@ namespace MiniSqlParser
       comments.Insert(3, typeNameComment);
       var typeName = context.type_name().GetText();
       var operand = (Expr)_stack.Pop();
-      var name = context.K_CAST().GetText();
-      var node = new CastExpr(operand, typeName, comments);
+      var node = new CastExpr(operand, typeName, false, comments);
       _stack.Push(node);
     }
 

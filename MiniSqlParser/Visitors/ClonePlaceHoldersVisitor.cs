@@ -204,7 +204,7 @@ namespace MiniSqlParser
         return;
       }
 
-      var node = new CastExpr(operand, expr.TypeName, expr.Comments.Clone());
+      var node = new CastExpr(operand, expr.TypeName, expr.IsPostgreSqlHistoricalCast, expr.Comments.Clone());
       _stack.Push(node); 
     }
     public override void VisitAfter(CaseExpr expr) {

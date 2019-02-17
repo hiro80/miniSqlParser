@@ -11,5 +11,10 @@ namespace MiniSqlParser
     , Equal2
     , NotEqual
     , NotEqual2
+    , ContainsJsonValueL  // @>
+    , ContainsJsonValueR  // <@
+    , ExistsJsonValue1    // ?
+    , ExistsJsonValue2    // ?|
+    , ExistsJsonValue3    // ?&
   }
 }

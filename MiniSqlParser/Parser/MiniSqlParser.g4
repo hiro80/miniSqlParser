@@ -437,7 +437,10 @@ predicate
  | PLACEHOLDER2                                         # PhPredicate
  | expr op=( '<' | '<=' | '>'  | '>=' ) expr            # BinaryOpPredicate
  | expr op=( '=' | '==' | '!=' | '<>' ) expr            # BinaryOpPredicate
- | expr K_NOT? op=( K_LIKE | K_ILIKE | K_GLOB | K_MATCH | K_REGEXP )
+ | expr {IsPostgreSql}? op=( '<@' | '@>' |  '?|' | '?&' )
+   expr                                                 # BinaryOpPredicate
+ | expr K_NOT?
+   op=( K_LIKE | K_ILIKE | K_GLOB | K_MATCH | K_REGEXP )
    expr ( K_ESCAPE expr )?                              # LikePredicate
  | expr K_IS K_NOT? K_NULL                              # IsNullPredicate
  | expr K_IS K_NOT? expr                                # IsPredicate
@@ -473,14 +476,20 @@ expr
  | literal_value                      # LiteralExpr
  | PLACEHOLDER1                       # PhExpr
  | PLACEHOLDER2                       # PhExpr
- | column_name ( {IsOracle}? OUTER_JOIN )? # ColumnExpr
+ | column_name ( {IsOracle}? OUTER_JOIN )?  # ColumnExpr
  | '(' query ')'                      # SubQueryExpr
+ | expr {IsPostgreSql}? '::' type_name # PostgreSqlCastExpr
  | '~' expr                           # BitwiseNotExpr
  | expr {IsOracle || IsSQLite || IsPostgreSql}?
         op='||' expr                  # BinaryOpExpr
  | expr op=( '*' | '/' | '%' ) expr   # BinaryOpExpr
  | expr op=( '+' | '-' ) expr         # BinaryOpExpr
- | expr op=( '<<' | '>>' | '&' | '|' ) expr  # BinaryOpExpr
+ | expr op=( '<<' | '>>' | '&' | '|' ) expr # BinaryOpExpr
+ | expr {IsPostgreSql}?
+        /* '?' expr is recogify with PLACEHOLDER2. */
+        /* so, currently ignore this expr.         */
+        op=( '->' | '->>' | '#>' | '#>>' | '#-' ) 
+   expr                               # BinaryOpExpr
  | substring_function                 # SubstrFuncExpr
  | extract_function                   # ExtractFuncExpr
  | aggregate_function1                # AggregateFuncExpr
@@ -702,6 +711,7 @@ identifiable_keyword
  | K_SECOND
 /* | K_SELECT  */
 /* | K_SET     */
+ | K_SIMILAR
  | K_SKIP
  | K_SOME
  | K_SUM
@@ -792,6 +802,15 @@ EQ    : '==';
 NOT_EQ1 : '!=';
 NOT_EQ2 : '<>';
 OUTER_JOIN : '(+)';
+ARROW  : '->';
+ARROW2 : '->>';
+S_GT  : '#>';
+S_GT2 : '#>>';
+S_MINUS : '#-';
+AT_GT : '@>';
+AT_LT : '<@';
+QRY_PIPE : '?|';
+QRY_AMP  : '?&';
 
 
 UINTEGER_LITERAL
@@ -985,6 +1004,7 @@ K_ROWS     : R O W S;
 K_SECOND   : S E C O N D;
 K_SELECT   : S E L E C T;
 K_SET      : S E T;
+K_SIMILAR  : S I M I L A R;
 K_SKIP     : S K I P;
 K_SOME     : S O M E;
 K_SUM      : S U M;

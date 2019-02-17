@@ -901,6 +901,18 @@ public interface IMiniSqlParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitGenericFuncExpr([NotNull] MiniSqlParserParser.GenericFuncExprContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>PostgreSqlCastExpr</c>
+	/// labeled alternative in <see cref="MiniSqlParserParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPostgreSqlCastExpr([NotNull] MiniSqlParserParser.PostgreSqlCastExprContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PostgreSqlCastExpr</c>
+	/// labeled alternative in <see cref="MiniSqlParserParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPostgreSqlCastExpr([NotNull] MiniSqlParserParser.PostgreSqlCastExprContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>SignedNumberExpr</c>
 	/// labeled alternative in <see cref="MiniSqlParserParser.expr"/>.
 	/// </summary>
