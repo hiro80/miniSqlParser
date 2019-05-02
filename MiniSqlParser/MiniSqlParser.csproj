@@ -50,6 +50,7 @@
     <Compile Include="Assignment.cs" />
     <Compile Include="Assignments.cs" />
     <Compile Include="BestCaseDictionary.cs" />
+    <Compile Include="Enums\MsSqlHint.cs" />
     <Compile Include="Parser\MiniSqlParserBaseListener.cs" />
     <Compile Include="Parser\MiniSqlParserLexer.cs" />
     <Compile Include="Parser\MiniSqlParserListener.cs" />

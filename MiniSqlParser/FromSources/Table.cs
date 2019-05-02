@@ -131,6 +131,9 @@ namespace MiniSqlParser
     public Identifier IndexName { get; private set; }
     public bool HasNotIndexed { get; private set; }
 
+    // MS SQL Serverでのテーブルヒント
+    public MsSqlHint MsSqlHint { get; private set; }
+
     public Table Clone() {
       var ret = new Table(_serverName
                         , _dataBaseName
@@ -144,6 +147,7 @@ namespace MiniSqlParser
                         , this.IndexSchemaName
                         , this.IndexName
                         , this.HasNotIndexed
+                        , this.MsSqlHint
                         , this.Comments.Clone());
       ret.Attachment = this.Attachment;
       return ret;
@@ -165,7 +169,9 @@ namespace MiniSqlParser
            , null
            , null
            , null
-           , false,comments){
+           , false
+           , MsSqlHint.None
+           , comments){
     }
 
     internal Table(Identifier serverName
@@ -188,6 +194,7 @@ namespace MiniSqlParser
             , null
             , null
             , false
+            , MsSqlHint.None
             , comments) {
     }
 
@@ -203,6 +210,7 @@ namespace MiniSqlParser
                   , Identifier indexSchemaName
                   , Identifier indexName
                   , bool hasNotIndexed
+                  , MsSqlHint msSqlHint
                   , Comments comments) {
       _serverName = serverName;
       _dataBaseName = databaseName;
@@ -216,6 +224,7 @@ namespace MiniSqlParser
       this.IndexSchemaName = indexSchemaName;
       this.IndexName = indexName;
       this.HasNotIndexed = hasNotIndexed;
+      this.MsSqlHint = msSqlHint;
       this.Comments = comments;
     }
 
@@ -230,7 +239,8 @@ namespace MiniSqlParser
             , null
             , null
             , null
-            , false) {
+            , false
+            , MsSqlHint.None) {
     }
 
     public Table(Identifier name
@@ -246,7 +256,8 @@ namespace MiniSqlParser
             , null
             , null
             , null
-            , false) {
+            , false
+            , MsSqlHint.None) {
     }
 
     public Table(Identifier schemaName
@@ -261,7 +272,8 @@ namespace MiniSqlParser
             , null
             , null
             , null
-            , false) {
+            , false
+            , MsSqlHint.None) {
     }
 
     public Table(Identifier serverName
@@ -278,7 +290,8 @@ namespace MiniSqlParser
             , null
             , null
             , null
-            , false) {
+            , false
+            , MsSqlHint.None) {
     }
 
     public Table(Identifier serverName
@@ -297,7 +310,8 @@ namespace MiniSqlParser
             , null
             , null
             , null
-            , false) {
+            , false
+            , MsSqlHint.None) {
     }
 
     public Table(Identifier serverName
@@ -310,7 +324,8 @@ namespace MiniSqlParser
                 , Identifier indexDatabaseName
                 , Identifier indexSchemaName
                 , Identifier indexName
-                , bool hasNotIndexed) {
+                , bool hasNotIndexed
+                , MsSqlHint msSqlHint) {
       _serverName = serverName;
       _dataBaseName = databaseName;
       _schemaName = schemaName;
@@ -322,8 +337,10 @@ namespace MiniSqlParser
       this.IndexSchemaName = indexSchemaName;
       this.IndexName = indexName;
       this.HasNotIndexed = hasNotIndexed;
+      this.MsSqlHint = msSqlHint;
 
       // コメントスロット数を計算する
+      var h = CountTrue(msSqlHint != MsSqlHint.None) * 4;
       var n = CountTrue(!string.IsNullOrEmpty(indexName)) * 3;
       var m = CountTrue(!string.IsNullOrEmpty(serverName)
                       , !string.IsNullOrEmpty(databaseName)
@@ -335,7 +352,7 @@ namespace MiniSqlParser
       var l = CountTrue(HasAs
                       , !string.IsNullOrEmpty(aliasName));
 
-      this.Comments = new Comments(n + m + l + 1);
+      this.Comments = new Comments(h + n + m + l + 1);
     }
 
     protected override void AcceptImp(IVisitor visitor) {

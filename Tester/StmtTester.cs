@@ -642,7 +642,7 @@ namespace Tester
       Assert.That(parse(select)
           , Is.EqualTo(@"SELECT Tbl.* FROM Tbl"));
 
-      table = new Table("s", "d", "sc", "t", true, "t1", "idxS", "idxD", "idxSc", "idx", false);
+      table = new Table("s", "d", "sc", "t", true, "t1", "idxS", "idxD", "idxSc", "idx", false, MsSqlHint.None);
       query.From = table;
 
       Assert.That(query.Comments.Count, Is.EqualTo(2));
@@ -650,7 +650,7 @@ namespace Tester
           , Is.EqualTo(@"SELECT Tbl.* FROM s.d.sc.t AS t1 INDEXED BY "
                        + "idxS.idxD.idxSc.idx"));
 
-      table = new Table("s", "d", "sc", "t", true, "t1", "", "", "", "", true);
+      table = new Table("s", "d", "sc", "t", true, "t1", "", "", "", "", true, MsSqlHint.None);
       query.From = table;
 
       Assert.That(query.Comments.Count, Is.EqualTo(2));
@@ -1600,6 +1600,31 @@ namespace Tester
           , Is.EqualTo(@"DELETE/*0*/ T/*1*/ FROM/*2*/ U/*3*/ "
                       + "WHERE/*4*/ T/*5*/./*6*/id/*7*/=/*8*/U/*9*/./*10*/id/*11*/(+)/*12*/"));
     }
+    
+    [Test]
+    public void HintedTable() {
+      Assert.That(parse(@"SELECT * FROM T WITH (NOLOCK)")
+           , Is.EqualTo(@"SELECT * FROM T WITH(NOLOCK)"));
+
+      Assert.That(parse(@"UPDATE T WITH (readCommitted) SET x=1")
+           , Is.EqualTo(@"UPDATE T WITH(READCOMMITTED) SET x=1"));
+
+      Assert.That(parse(@"DELETE T WITH (repeatableRead) WHERE x=1")
+           , Is.EqualTo(@"DELETE T WITH(REPEATABLEREAD) WHERE x=1"));
+
+      Assert.That(parse(@"SELECT * FROM T WITH (SERIALIZABLE)")
+           , Is.EqualTo(@"SELECT * FROM T WITH(SERIALIZABLE)"));
+
+      Assert.That(parse(@"SELECT/*1*/ */*2*/ FROM/*3*/ T/*4*/ WITH/*5*/ (/*6*/NOLOCK/*7*/)/*8*/")
+           , Is.EqualTo(@"SELECT/*1*/ */*2*/ FROM/*3*/ T/*4*/ WITH/*5*/(/*6*/NOLOCK/*7*/)/*8*/"));
+
+      Assert.That(parse(@"DELETE/*1*/ T/**t*/ WITH/*2*/ (/*3*/repeatableRead/*4*/)/*5*/ WHERE x=1")
+           , Is.EqualTo(@"DELETE/*1*/ T/**t*/ WITH/*2*/(/*3*/REPEATABLEREAD/*4*/)/*5*/ WHERE x=1"));
+
+      Assert.That(parse(@"SELECT/*1*/ */*2*/ FROM/*3*/ T/*4*/ t/*5*/ WITH/*6*/ (/*7*/SERIALIZABLE/*8*/)/*9*/")
+           , Is.EqualTo(@"SELECT/*1*/ */*2*/ FROM/*3*/ T/*4*/ t/*5*/ WITH/*6*/(/*7*/SERIALIZABLE/*8*/)/*9*/"));
+    }
+
 
     [Test]
     public void MergeStmt() {

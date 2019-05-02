@@ -183,7 +183,7 @@ update_stmt
    | {IsSQLite}? K_OR K_REPLACE
    | {IsSQLite}? K_OR K_FAIL
    | {IsSQLite}? K_OR K_IGNORE )?
-  (  {IsSQLite || IsMsSql}?                                indexed_table_name
+  (  {IsSQLite || IsMsSql}?                                hinted_table_name
    | {IsOracle || IsMySql || IsPostgreSql || IsPervasive}? aliased_table_name )
    K_SET assignments
    ( {IsMsSql || IsPostgreSql}? K_FROM aliased_table_name )?
@@ -211,7 +211,7 @@ replace_stmt
 delete_stmt
  : with_clause? K_DELETE
    f1=K_FROM? 
-  (  {IsMySql  || IsSQLite     || IsMsSql}?     indexed_table_name
+  (  {IsMySql  || IsSQLite     || IsMsSql}?     hinted_table_name
    | {IsOracle || IsPostgreSql || IsPervasive}? aliased_table_name )
    ( {IsMsSql}? f2=K_FROM aliased_table_name )?
    ( K_WHERE predicate )?
@@ -343,7 +343,7 @@ exprs
  ;
 
 join_clause
- : indexed_aliased_table_name                             # TableSource
+ : hinted_aliased_table_name                              # TableSource
  | aliased_query                                          # SubQuerySource
  | join_clause join_operator join_clause join_constraint? # JoinSource
  | '(' join_clause ')' ( K_AS? table_alias )?             # BracketedSource
@@ -576,14 +576,17 @@ aliased_table_name
  : table_name ( K_AS? table_alias )?
  ;
 
-indexed_table_name
- : table_name
-   ( {IsSQLite}? ( K_INDEXED K_BY index_name | K_NOT K_INDEXED ) )?
+hinted_table_name
+ : table_name table_hint?
  ;
 
-indexed_aliased_table_name
- : aliased_table_name
-   ( {IsSQLite}? ( K_INDEXED K_BY index_name | K_NOT K_INDEXED ) )?
+hinted_aliased_table_name
+ : aliased_table_name table_hint?
+ ;
+
+table_hint
+ : {IsSQLite}? ( K_INDEXED K_BY index_name | K_NOT K_INDEXED )
+ | {IsMsSql}?  ( K_WITH '(' h=( K_NOLOCK | K_READCOMMITTED | K_REPEATABLEREAD | K_SERIALIZABLE ) ')' )
  ;
 
 type_name
@@ -685,6 +688,7 @@ identifiable_keyword
  | K_MONTH
  | K_NATURAL
  | K_NEXT
+ | K_NOLOCK
 /* | K_NOT      */
  | K_NOWAIT
 /* | K_NULL     */
@@ -700,8 +704,10 @@ identifiable_keyword
  | K_OVER
  | K_PRAGMA
  | K_PARTITION
+ | K_READCOMMITTED
  | K_RECURSIVE
  | K_REGEXP
+ | K_REPEATABLEREAD
  | K_REPLACE
  | K_PERCENT
  | K_RIGHT
@@ -710,6 +716,7 @@ identifiable_keyword
  | K_ROWS
  | K_SECOND
 /* | K_SELECT  */
+ | K_SERIALIZABLE
 /* | K_SET     */
  | K_SIMILAR
  | K_SKIP
@@ -978,6 +985,7 @@ K_MINUTE   : M I N U T E;
 K_MONTH    : M O N T H;
 K_NATURAL  : N A T U R A L;
 K_NEXT     : N E X T;
+K_NOLOCK   : N O L O C K;
 K_NOT      : N O T;
 K_NOWAIT   : N O W A I T;
 K_NULL     : N U L L;
@@ -993,8 +1001,10 @@ K_OUTPUT   : O U T P U T;
 K_OVER     : O V E R;
 K_PRAGMA   : P R A G M A;
 K_PARTITION  : P A R T I T I O N;
+K_READCOMMITTED : R E A D C O M M I T T E D;
 K_RECURSIVE  : R E C U R S I V E;
 K_REGEXP   : R E G E X P;
+K_REPEATABLEREAD : R E P E A T A B L E R E A D;
 K_REPLACE  : R E P L A C E;
 K_PERCENT  : P E R C E N T;
 K_RIGHT    : R I G H T;
@@ -1003,6 +1013,7 @@ K_ROW      : R O W;
 K_ROWS     : R O W S;
 K_SECOND   : S E C O N D;
 K_SELECT   : S E L E C T;
+K_SERIALIZABLE : S E R I A L I Z A B L E;
 K_SET      : S E T;
 K_SIMILAR  : S I M I L A R;
 K_SKIP     : S K I P;

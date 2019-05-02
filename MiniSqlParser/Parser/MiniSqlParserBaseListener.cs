@@ -1363,29 +1363,41 @@ public partial class MiniSqlParserBaseListener : IMiniSqlParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAliased_table_name([NotNull] MiniSqlParserParser.Aliased_table_nameContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.indexed_table_name"/>.
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.hinted_table_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterIndexed_table_name([NotNull] MiniSqlParserParser.Indexed_table_nameContext context) { }
+	public virtual void EnterHinted_table_name([NotNull] MiniSqlParserParser.Hinted_table_nameContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.indexed_table_name"/>.
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.hinted_table_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitIndexed_table_name([NotNull] MiniSqlParserParser.Indexed_table_nameContext context) { }
+	public virtual void ExitHinted_table_name([NotNull] MiniSqlParserParser.Hinted_table_nameContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.indexed_aliased_table_name"/>.
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.hinted_aliased_table_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterIndexed_aliased_table_name([NotNull] MiniSqlParserParser.Indexed_aliased_table_nameContext context) { }
+	public virtual void EnterHinted_aliased_table_name([NotNull] MiniSqlParserParser.Hinted_aliased_table_nameContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.indexed_aliased_table_name"/>.
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.hinted_aliased_table_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitIndexed_aliased_table_name([NotNull] MiniSqlParserParser.Indexed_aliased_table_nameContext context) { }
+	public virtual void ExitHinted_aliased_table_name([NotNull] MiniSqlParserParser.Hinted_aliased_table_nameContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.table_hint"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterTable_hint([NotNull] MiniSqlParserParser.Table_hintContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.table_hint"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitTable_hint([NotNull] MiniSqlParserParser.Table_hintContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.type_name"/>.
 	/// <para>The default implementation does nothing.</para>

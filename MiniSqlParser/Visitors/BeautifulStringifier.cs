@@ -411,6 +411,44 @@ namespace MiniSqlParser
         this.AppendString(table.IndexName);
         this.AppendComment(table.Comments[++i]);
       }
+
+      if(table.MsSqlHint == MsSqlHint.NoLock) {
+        this.AppendKeyword(" WITH");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendSymbol("(");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendKeyword("NOLOCK");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendSymbol(")");
+        this.AppendComment(table.Comments[++i]);
+      } else if(table.MsSqlHint == MsSqlHint.ReadCommitted) {
+        this.AppendKeyword(" WITH");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendSymbol("(");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendKeyword("READCOMMITTED");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendSymbol(")");
+        this.AppendComment(table.Comments[++i]);
+      } else if(table.MsSqlHint == MsSqlHint.RepeatableRead) {
+        this.AppendKeyword(" WITH");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendSymbol("(");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendKeyword("REPEATABLEREAD");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendSymbol(")");
+        this.AppendComment(table.Comments[++i]);
+      } else if(table.MsSqlHint == MsSqlHint.Serializable) {
+        this.AppendKeyword(" WITH");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendSymbol("(");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendKeyword("SERIALIZABLE");
+        this.AppendComment(table.Comments[++i]);
+        this.AppendSymbol(")");
+        this.AppendComment(table.Comments[++i]);
+      }
     }
 
     public override void Visit(Column column) {

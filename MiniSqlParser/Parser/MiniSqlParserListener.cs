@@ -1151,25 +1151,35 @@ public interface IMiniSqlParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitAliased_table_name([NotNull] MiniSqlParserParser.Aliased_table_nameContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.indexed_table_name"/>.
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.hinted_table_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterIndexed_table_name([NotNull] MiniSqlParserParser.Indexed_table_nameContext context);
+	void EnterHinted_table_name([NotNull] MiniSqlParserParser.Hinted_table_nameContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.indexed_table_name"/>.
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.hinted_table_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitIndexed_table_name([NotNull] MiniSqlParserParser.Indexed_table_nameContext context);
+	void ExitHinted_table_name([NotNull] MiniSqlParserParser.Hinted_table_nameContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.indexed_aliased_table_name"/>.
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.hinted_aliased_table_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterIndexed_aliased_table_name([NotNull] MiniSqlParserParser.Indexed_aliased_table_nameContext context);
+	void EnterHinted_aliased_table_name([NotNull] MiniSqlParserParser.Hinted_aliased_table_nameContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.indexed_aliased_table_name"/>.
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.hinted_aliased_table_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitIndexed_aliased_table_name([NotNull] MiniSqlParserParser.Indexed_aliased_table_nameContext context);
+	void ExitHinted_aliased_table_name([NotNull] MiniSqlParserParser.Hinted_aliased_table_nameContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.table_hint"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterTable_hint([NotNull] MiniSqlParserParser.Table_hintContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.table_hint"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitTable_hint([NotNull] MiniSqlParserParser.Table_hintContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.type_name"/>.
 	/// </summary>

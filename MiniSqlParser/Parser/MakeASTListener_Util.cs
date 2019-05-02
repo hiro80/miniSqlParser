@@ -236,7 +236,7 @@ namespace MiniSqlParser
       return this.GetTableAliasNameFromDocComment(context.table_name());
     }
 
-    private string GetTableAliasNameFromDocComment(MiniSqlParserParser.Indexed_table_nameContext context) {
+    private string GetTableAliasNameFromDocComment(MiniSqlParserParser.Hinted_table_nameContext context) {
       return this.GetTableAliasNameFromDocComment(context.table_name());
     }
 
