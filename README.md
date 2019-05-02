@@ -30,6 +30,11 @@ ast.Accept(stringifier);
 string formattedSql = stringifier.ToString();
 ```
 
+## Abstract Syntax Tree
+構文木の出力結果例
+
+![Alt text](SQLParserTree.png)
+
 ## Requirement
 * Antlr4.Runtime.Standard 4.7.1
 * .NET Framework 2.0 以上
