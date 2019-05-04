@@ -1125,8 +1125,11 @@ namespace MiniSqlParser
     }
 
     public override void ExitHinted_table_name(MiniSqlParserParser.Hinted_table_nameContext context) {
-      if(context.table_hint() == null) {
-        // table_hintが存在しない場合はなにもしない
+      // コメントでテーブル別名の指定があれば取得する
+      var implicitAliasName = this.GetTableAliasNameFromDocComment(context);
+
+      if(context.table_hint() == null && string.IsNullOrEmpty(implicitAliasName)) {
+        // Tableオブジェクトを再作成する必要がなければ何もしない
         return;
       }
 
@@ -1135,8 +1138,6 @@ namespace MiniSqlParser
       comments.AddRange(this.GetComments(context));
       comments.AddRange(this.GetComments(context.table_hint()));
 
-      // コメントでテーブル別名の指定があれば取得する
-      var implicitAliasName = this.GetTableAliasNameFromDocComment(context);
 
       var hinted_table = this.CreateHintedTable(context.table_hint()
                                               , tableNode
@@ -1172,20 +1173,23 @@ namespace MiniSqlParser
       Identifier indexSchemaName = null;
       Identifier indexName = null;
       bool hasNotIndexed = false;
+      var msSqlHint = MsSqlHint.None;
 
-      if(table_hintContext.K_NOT() != null) {
-        hasNotIndexed = true;
-      } else if(table_hintContext.K_INDEXED() != null) {
-        comments.AddRange(this.GetComments(table_hintContext.index_name().qualified_schema_name()));
-        comments.AddRange(this.GetComments(table_hintContext.index_name()));
-        if(table_hintContext.index_name().qualified_schema_name() != null) {
-          indexServerName = this.GetIdentifier(table_hintContext.index_name().qualified_schema_name().s);
-          indexDatabaseName = this.GetIdentifier(table_hintContext.index_name().qualified_schema_name().d);
-          indexSchemaName = this.GetIdentifier(table_hintContext.index_name().qualified_schema_name().n);
+      if(table_hintContext != null) {
+        if(table_hintContext.K_NOT() != null) {
+          hasNotIndexed = true;
+        } else if(table_hintContext.K_INDEXED() != null) {
+          comments.AddRange(this.GetComments(table_hintContext.index_name().qualified_schema_name()));
+          comments.AddRange(this.GetComments(table_hintContext.index_name()));
+          if(table_hintContext.index_name().qualified_schema_name() != null) {
+            indexServerName = this.GetIdentifier(table_hintContext.index_name().qualified_schema_name().s);
+            indexDatabaseName = this.GetIdentifier(table_hintContext.index_name().qualified_schema_name().d);
+            indexSchemaName = this.GetIdentifier(table_hintContext.index_name().qualified_schema_name().n);
+          }
+          indexName = this.GetIdentifier(table_hintContext.index_name().identifier());
         }
-        indexName = this.GetIdentifier(table_hintContext.index_name().identifier());
+        msSqlHint = this.ConvToMsSqlHint(table_hintContext.h);
       }
-      var msSqlHint = this.ConvToMsSqlHint(table_hintContext.h);
 
       return new Table(tableNode.ServerName
                      , tableNode.DataBaseName
