@@ -219,7 +219,7 @@ delete_stmt
 
 merge_stmt
  : with_clause? 
-   K_MERGE K_INTO aliased_table_name
+   K_MERGE K_INTO? aliased_table_name
    K_USING ( aliased_table_name | aliased_query )
    K_ON ( {IsMsSql}? p=predicate | {IsOracle}? '(' predicate ')' )
    (  primary=  merge_update_clause merge_insert_clause?

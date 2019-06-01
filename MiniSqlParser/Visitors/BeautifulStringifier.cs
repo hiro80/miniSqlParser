@@ -1735,8 +1735,10 @@ namespace MiniSqlParser
 
       this.AppendKeyword("MERGE");
       this.AppendComment(mergeStmt.Comments[0]);
-      this.AppendKeyword(" INTO");
-      this.AppendComment(mergeStmt.Comments[1]);
+      if(mergeStmt.HasIntoKeyword) {
+        this.AppendKeyword(" INTO");
+        this.AppendComment(mergeStmt.Comments[1]);
+      }
       this.AppendString(" ");
     }
 

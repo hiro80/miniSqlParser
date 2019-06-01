@@ -462,12 +462,15 @@ namespace MiniSqlParser
 
       Table table = (Table)_stack.Pop();
 
+      var hasIntoKeyword = context.K_INTO() != null;
+
       WithClause withNode = null;
       if(context.with_clause() != null) {
         withNode = (WithClause)_stack.Pop();
       }
 
       var node = new MergeStmt(withNode
+                              , hasIntoKeyword
                               , table
                               , usingTable
                               , usingQuery

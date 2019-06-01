@@ -4,6 +4,7 @@ namespace MiniSqlParser
   public class MergeStmt : Stmt
   {
     internal MergeStmt(WithClause with
+                      , bool hasIntoKeyword
                       , Table table
                       , Table usingTable
                       , AliasedQuery usingQuery
@@ -14,6 +15,7 @@ namespace MiniSqlParser
                       , Comments comments) {
       this.Comments = comments;
       this.With = with;
+      this.HasIntoKeyword = hasIntoKeyword;
       this.Table = table;
       this.UsingTable = usingTable;
       this.UsingQuery = usingQuery;
@@ -33,6 +35,8 @@ namespace MiniSqlParser
         this.SetParent(value);
       }
     }
+
+    public bool HasIntoKeyword { get; protected set; }
 
     private Table _table;
     public Table Table {
@@ -139,7 +143,7 @@ namespace MiniSqlParser
       }
 
       visitor.VisitOnMerge(this);
-      int offset = 2;
+      int offset = this.HasIntoKeyword ? 2 : 1;
       this.Table.Accept(visitor);
 
       visitor.VisitOnUsing(this, offset);

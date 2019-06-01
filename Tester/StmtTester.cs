@@ -1705,6 +1705,14 @@ namespace Tester
                       + "USING (SELECT * FROM U) "
                       + "ON (T.id=U.id)"));
 
+      // Confirm not use of into keyword
+      Assert.That(parse(@"merge T
+                          using (select * from U)
+                          on (T.id = U.id)")
+          , Is.EqualTo(@"MERGE T "
+                      + "USING (SELECT * FROM U) "
+                      + "ON (T.id=U.id)"));
+
       Assert.That(parse(@"merge/*0*/ into/*1*/ A/*2*/./*3*/B/*4*/./*5*/C/*6*/./*7*/T/*8*/ A/*9*/
                           using/*10*/ U/*11*/ as/*12*/ u1/*13*/
                           on/*14*/ (/*15*/A/*16*/./*17*/id/*18*/ =/*19*/ u1/*20*/./*21*/id/*22*/ and/*23*/ A/*24*/./*25*/attr/*26*/ =/*27*/ u1/*28*/./*29*/attr/*30*/)/*31*/")
@@ -1756,6 +1764,13 @@ namespace Tester
                           using/*4*/ (/*5*/select/*6*/ */*7*/ from/*8*/ U/*9*/)/*10*/
                           on/*11*/ (/*12*/T/*13*/./*14*/id/*15*/ =/*16*/ U/*17*/./*18*/id/*19*/)/*20*/")
           , Is.EqualTo(@"MERGE/*1*/ INTO/*2*/ T/*3*/ "
+                      + "USING/*4*/ (/*5*/SELECT/*6*/ */*7*/ FROM/*8*/ U/*9*/)/*10*/ "
+                      + "ON/*11*/ (/*12*/T/*13*/./*14*/id/*15*/=/*16*/U/*17*/./*18*/id/*19*/)/*20*/"));
+
+      Assert.That(parse(@"merge/*1*/ T/*3*/
+                          using/*4*/ (/*5*/select/*6*/ */*7*/ from/*8*/ U/*9*/)/*10*/
+                          on/*11*/ (/*12*/T/*13*/./*14*/id/*15*/ =/*16*/ U/*17*/./*18*/id/*19*/)/*20*/")
+          , Is.EqualTo(@"MERGE/*1*/ T/*3*/ "
                       + "USING/*4*/ (/*5*/SELECT/*6*/ */*7*/ FROM/*8*/ U/*9*/)/*10*/ "
                       + "ON/*11*/ (/*12*/T/*13*/./*14*/id/*15*/=/*16*/U/*17*/./*18*/id/*19*/)/*20*/"));
     }
