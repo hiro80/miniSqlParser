@@ -198,12 +198,11 @@ insert_stmt
    | {IsSQLite}? K_INSERT K_OR K_ABORT    K_INTO
    | {IsSQLite}? K_INSERT K_OR K_FAIL     K_INTO
    | {IsSQLite}? K_INSERT K_OR K_IGNORE   K_INTO )
-   ( table_name | {IsPostgreSql}? aliased_table_name ) col1=unqualified_column_names?
+   table_name unqualified_column_names?
    ( K_VALUES values_clauses | query /*| K_DEFAULT K_VALUES*/ )
-   ( {IsPostgreSql}? 
-     K_ON ( K_CONFLICT col2=unqualified_column_names | K_CONSTRAINT constraint_name )
-     K_DO ( K_UPDATE K_SET assignments ( K_WHERE predicate )? | K_NOTHING )
-   )?
+   {IsPostgreSql}? 
+   K_ON ( K_CONFLICT unqualified_column_names | K_CONSTRAINT constraint_name )
+   K_DO ( K_UPDATE K_SET assignments ( K_WHERE predicate )? | K_NOTHING )
  ;
 
 replace_stmt

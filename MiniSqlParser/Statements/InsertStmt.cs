@@ -40,6 +40,41 @@ namespace MiniSqlParser
       }
     }
 
+    private UnqualifiedColumnNames _conflictColumns;
+    virtual public UnqualifiedColumnNames ConflictColumns {
+      get {
+        return _conflictColumns;
+      }
+      set {
+        _conflictColumns = value;
+        this.SetParent(value);
+      }
+    }
+
+    virtual public string ConstraintName { get; protected set; }
+
+    private Assignments _updateaAsignments;
+    virtual public Assignments UpdateAssignments {
+      get {
+        return _updateaAsignments;
+      }
+      protected set {
+        _updateaAsignments = value;
+        this.SetParent(value);
+      }
+    }
+
+    private Predicate _updateWhere;
+    public Predicate UpdateWhere {
+      get {
+        return _updateWhere;
+      }
+      protected set {
+        _updateWhere = value;
+        this.SetParent(value);
+      }
+    }
+
     virtual public bool HasWithClause {
       get {
         return this.With != null;
@@ -53,5 +88,12 @@ namespace MiniSqlParser
     }
 
     abstract public Assignments GetAssignments(int index);
+
+    virtual public bool IsPostgreSqlUpsert {
+      get {
+        return (_conflictColumns != null && _conflictColumns.Count > 0)
+               || !string.IsNullOrEmpty(ConstraintName);
+      }
+    }
   }
 }

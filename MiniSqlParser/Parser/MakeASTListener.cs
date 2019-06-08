@@ -122,7 +122,7 @@ namespace MiniSqlParser
     public override void ExitInsert_stmt(MiniSqlParserParser.Insert_stmtContext context) {
       var comments = this.GetComments(context);
       var hasIntoKeyword = context.K_INTO() != null;
-      var hasColumnNames = context.unqualified_column_names() != null;
+      var hasColumnNames = context.col1 != null;
 
       if(this.ForSqlAccessor && !hasIntoKeyword) {
         this.AddSqlAccessorSyntaxError("SqlPodではINSERT文のINTOキーワードを省略できません", context);
@@ -130,6 +130,27 @@ namespace MiniSqlParser
 
       if(this.ForSqlAccessor && !hasColumnNames) {
         this.AddSqlAccessorSyntaxError("SqlPodではINSERT文のテーブル列名の指定を省略できません", context);
+      }
+
+      // PostgreSQL UPDATE clause
+      Assignments updateaAsignments = null;
+      Predicate updateWhere = null;
+      if(context.K_UPDATE() != null) {
+        if(context.K_WHERE() != null) {
+          updateWhere = (Predicate)_stack.Pop();
+        }
+        updateaAsignments = (Assignments)_stack.Pop();
+      } else if(context.K_NOTHING() != null) {
+        // Do nothing
+      }
+
+      // PostgreSQL CONFLICT clause
+      UnqualifiedColumnNames conflictColumns = null;
+      string constraintName = null;
+      if(context.K_CONFLICT() != null) {
+        conflictColumns = (UnqualifiedColumnNames)_stack.Pop();
+      } else if(context.K_CONSTRAINT() != null) {
+        constraintName = this.GetIdentifier(context.constraint_name().identifier());
       }
 
       ValuesList valuesList = null;
@@ -148,9 +169,11 @@ namespace MiniSqlParser
       }
 
       var tableNode = (Table)_stack.Pop();
-      // コメントでテーブル別名の指定があれば取得する
-      var implicitAliasName = this.GetTableAliasNameFromDocComment(context.table_name());
-      tableNode.ImplicitAliasName = implicitAliasName;
+      if(context.table_name() != null) {
+        // コメントでテーブル別名の指定があれば取得する
+        var implicitAliasName = this.GetTableAliasNameFromDocComment(context.table_name());
+        tableNode.ImplicitAliasName = implicitAliasName;
+      }
 
       ConflictType onConflict = ConflictType.None;
       if(context.K_OR() != null) {
@@ -175,27 +198,63 @@ namespace MiniSqlParser
       }
 
       if(context.K_VALUES() != null) {
-        var node = new InsertValuesStmt(withNode
-                                      , false
-                                      , onConflict
-                                      , hasIntoKeyword
-                                      , tableNode
-                                      , columns
-                                      , valuesList
-                                      , comments);
+        InsertValuesStmt node = null;
+        if(context.K_CONFLICT() != null) {
+          node = new InsertValuesStmt(withNode
+                                    , false
+                                    , onConflict
+                                    , hasIntoKeyword
+                                    , tableNode
+                                    , columns
+                                    , valuesList
+                                    , conflictColumns
+                                    , updateaAsignments
+                                    , updateWhere
+                                    , comments);
+        } else {
+          node = new InsertValuesStmt(withNode
+                                    , false
+                                    , onConflict
+                                    , hasIntoKeyword
+                                    , tableNode
+                                    , columns
+                                    , valuesList
+                                    , constraintName
+                                    , updateaAsignments
+                                    , updateWhere
+                                    , comments);
+        }
         // INSERT-VALUES文の先頭コメント、プレースホルダ初期値を設定する
         node.HeaderComment = this.GetHeaderComment(context.Start.TokenIndex);
         node.PlaceHolderAssignComments = this.GetDefaultValuePlaceHolders(context.Start.TokenIndex);
         _stack.Push(node);
       } else {
-        var node = new InsertSelectStmt(withNode
-                                      , false
-                                      , onConflict
-                                      , hasIntoKeyword
-                                      , tableNode
-                                      , columns
-                                      , query
-                                      , comments);
+        InsertSelectStmt node = null;
+        if(context.K_CONFLICT() != null) {
+          node = new InsertSelectStmt(withNode
+                                    , false
+                                    , onConflict
+                                    , hasIntoKeyword
+                                    , tableNode
+                                    , columns
+                                    , query
+                                    , conflictColumns
+                                    , updateaAsignments
+                                    , updateWhere
+                                    , comments);
+        } else {
+          node = new InsertSelectStmt(withNode
+                                    , false
+                                    , onConflict
+                                    , hasIntoKeyword
+                                    , tableNode
+                                    , columns
+                                    , query
+                                    , constraintName
+                                    , updateaAsignments
+                                    , updateWhere
+                                    , comments);
+        }
         // INSERT-SELECT文の先頭コメント、プレースホルダ初期値及びAutoWhere値を設定する
         node.HeaderComment = this.GetHeaderComment(context.Start.TokenIndex);
         node.PlaceHolderAssignComments = this.GetDefaultValuePlaceHolders(context.Start.TokenIndex);

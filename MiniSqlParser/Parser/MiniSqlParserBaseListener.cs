@@ -1423,6 +1423,18 @@ public partial class MiniSqlParserBaseListener : IMiniSqlParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitCollation_name([NotNull] MiniSqlParserParser.Collation_nameContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.constraint_name"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterConstraint_name([NotNull] MiniSqlParserParser.Constraint_nameContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.constraint_name"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitConstraint_name([NotNull] MiniSqlParserParser.Constraint_nameContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.table_alias"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

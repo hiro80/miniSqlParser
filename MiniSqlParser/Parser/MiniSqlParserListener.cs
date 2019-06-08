@@ -1201,6 +1201,16 @@ public interface IMiniSqlParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitCollation_name([NotNull] MiniSqlParserParser.Collation_nameContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.constraint_name"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterConstraint_name([NotNull] MiniSqlParserParser.Constraint_nameContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="MiniSqlParserParser.constraint_name"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitConstraint_name([NotNull] MiniSqlParserParser.Constraint_nameContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="MiniSqlParserParser.table_alias"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

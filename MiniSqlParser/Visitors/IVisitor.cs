@@ -188,8 +188,11 @@ namespace MiniSqlParser
     void VisitOnInsert(InsertStmt insertStmt);
     void VisitOnValues(InsertValuesStmt insertValuesStmt, int offset);
     void VisitBeforeQuery(InsertSelectStmt insertSelectStmt, int offset);
-
     void VisitOnDefaultValues(InsertStmt insertStmt, int offset);
+    void VisitOnOn(InsertStmt insertStmt, int offset);
+    void VisitOnDo(InsertStmt insertStmt, int offset);
+    void VisitOnWhere(InsertStmt insertStmt, int offset);
+
     void VisitBefore(IfStmt ifStmt);
     void VisitAfter(IfStmt ifStmt);
     void VisitOnThen(IfStmt ifStmt, int ifThenIndex, int offset);

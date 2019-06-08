@@ -44,7 +44,8 @@ namespace MiniSqlParser
           if(   child.GetType() == typeof(MiniSqlParserParser.IdentifierContext)
              || child.GetType() == typeof(MiniSqlParserParser.Column_aliasContext)
              || child.GetType() == typeof(MiniSqlParserParser.Table_aliasContext)
-             || child.GetType() == typeof(MiniSqlParserParser.Collation_nameContext)) {
+             || child.GetType() == typeof(MiniSqlParserParser.Collation_nameContext)
+             || child.GetType() == typeof(MiniSqlParserParser.Constraint_nameContext)) {
             child = child.GetChild(0);
           } else {
             continue;

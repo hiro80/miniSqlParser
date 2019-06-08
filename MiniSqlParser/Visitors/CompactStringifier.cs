@@ -1163,6 +1163,43 @@ namespace MiniSqlParser
       this.AppendString(" ");
     }
 
+    public override void VisitOnOn(InsertStmt insertStmt, int offset) {
+      this.AppendKeyword(" ON");
+      this.AppendComment(insertStmt.Comments[offset]);
+
+      if(insertStmt.ConflictColumns != null) {
+        this.AppendKeyword(" CONFLICT");
+        this.AppendComment(insertStmt.Comments[offset + 1]);
+      } else {
+        this.AppendKeyword(" CONSTRAINT");
+        this.AppendComment(insertStmt.Comments[offset + 1]);
+        this.AppendString(" ");
+        this.AppendString(insertStmt.ConstraintName);
+        this.AppendComment(insertStmt.Comments[offset + 2]);
+      }
+    }
+
+    public override void VisitOnDo(InsertStmt insertStmt, int offset) {
+      this.AppendKeyword(" DO");
+      this.AppendComment(insertStmt.Comments[offset]);
+      if(insertStmt.UpdateAssignments != null) {
+        this.AppendKeyword(" UPDATE");
+        this.AppendComment(insertStmt.Comments[offset + 1]);
+        this.AppendKeyword(" SET");
+        this.AppendComment(insertStmt.Comments[offset + 2]);
+        this.AppendString(" ");
+      } else {
+        this.AppendKeyword(" NOTHING");
+        this.AppendComment(insertStmt.Comments[offset + 1]);
+      }
+    }
+
+    public override void VisitOnWhere(InsertStmt insertStmt, int offset) {
+      this.AppendKeyword(" WHERE");
+      this.AppendComment(insertStmt.Comments[offset]);
+      this.AppendString(" ");
+    }
+
     public override void VisitBefore(IfStmt ifStmt) {
       this.AppendComment(ifStmt.HeaderComment);
       this.AppendKeyword("IF");

@@ -12,6 +12,82 @@ namespace MiniSqlParser
                             , Table table
                             , UnqualifiedColumnNames columns
                             , ValuesList valuesList
+                            , Comments comments)
+      :this(with
+          , isReplaceStmt
+          , onConflict
+          , hasIntoKeyword
+          , table
+          , columns
+          , valuesList
+          , null
+          , null
+          , null
+          , null
+          , comments) {
+    }
+
+    internal InsertValuesStmt(WithClause with
+                            , bool isReplaceStmt
+                            , ConflictType onConflict
+                            , bool hasIntoKeyword
+                            , Table table
+                            , UnqualifiedColumnNames columns
+                            , ValuesList valuesList
+                            , UnqualifiedColumnNames conflictColumns
+                            , Assignments updateaAsignments
+                            , Predicate updateWhere
+                            , Comments comments)
+      :this(with
+          , isReplaceStmt
+          , onConflict
+          , hasIntoKeyword
+          , table
+          , columns
+          , valuesList
+          , conflictColumns
+          , null
+          , updateaAsignments
+          , updateWhere
+          , comments) {
+    }
+
+    internal InsertValuesStmt(WithClause with
+                            , bool isReplaceStmt
+                            , ConflictType onConflict
+                            , bool hasIntoKeyword
+                            , Table table
+                            , UnqualifiedColumnNames columns
+                            , ValuesList valuesList
+                            , string constraintName
+                            , Assignments updateaAsignments
+                            , Predicate updateWhere
+                            , Comments comments)
+      : this(with
+          , isReplaceStmt
+          , onConflict
+          , hasIntoKeyword
+          , table
+          , columns
+          , valuesList
+          , null
+          , constraintName
+          , updateaAsignments
+          , updateWhere
+          , comments) {
+    }
+
+    private InsertValuesStmt(WithClause with
+                            , bool isReplaceStmt
+                            , ConflictType onConflict
+                            , bool hasIntoKeyword
+                            , Table table
+                            , UnqualifiedColumnNames columns
+                            , ValuesList valuesList
+                            , UnqualifiedColumnNames conflictColumns
+                            , string constraintName
+                            , Assignments updateaAsignments
+                            , Predicate updateWhere
                             , Comments comments) {
       this.Comments = comments;
       this.With = with;
@@ -21,6 +97,14 @@ namespace MiniSqlParser
       this.Table = table;
       this.Columns = columns;
       this.ValuesList = valuesList;
+      this.ConflictColumns = conflictColumns;
+      this.ConstraintName = constraintName;
+      this.UpdateAssignments = updateaAsignments;
+      this.UpdateWhere = updateWhere;
+      if(updateaAsignments == null && updateWhere != null) {
+        throw new System.ArgumentException(
+          "UpdateaAsignments must be not null, if updateWhere is not null. ");
+      }
     }
 
     private ValuesList _valuesList;
@@ -116,6 +200,36 @@ namespace MiniSqlParser
 
       // Valuesリストの走査
       this.ValuesList.Accept(visitor);
+
+      // PostgreSQL CONFLICT構文
+      if(this.IsPostgreSqlUpsert) {
+        visitor.VisitOnOn(this, offset);
+
+        offset += 1;  // ON句
+        offset += 1;  // CONFLICTまたはCONSTRAINT句
+
+        if(this.ConflictColumns != null) {
+          this.ConflictColumns.Accept(visitor);
+        } else {
+          offset += 1; // constraint_name
+        }
+
+        visitor.VisitOnDo(this, offset);
+        offset += 1;  // DO句
+
+        if(this.UpdateAssignments != null) {
+          offset += 2;  // UPDATE SET句
+          this.UpdateAssignments.Accept(visitor);
+
+          if(this.UpdateWhere != null) {
+            visitor.VisitOnWhere(this, offset);
+            offset += 1; // WHERE句
+            this.UpdateWhere.Accept(visitor);
+          }
+        } else {
+          offset += 1;  // NOTHING句
+        }
+      }
 
       for(var i = 0; i < this.StmtSeparators; ++i) {
         visitor.VisitOnStmtSeparator(this, offset, i);

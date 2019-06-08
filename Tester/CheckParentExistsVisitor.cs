@@ -666,6 +666,10 @@ namespace Tester
       this.ParentExists(deleteStmt);
     }
 
+    void IVisitor.VisitOnDo(InsertStmt insertStmt, int offset) {
+      this.ParentExists(insertStmt);
+    }
+
     void IVisitor.VisitOnElsIf(IfStmt ifStmt, int ifThenIndex, int offset) {
       this.ParentExists(ifStmt);
     }
@@ -716,6 +720,10 @@ namespace Tester
 
     void IVisitor.VisitOnOn(MergeStmt mergeStmt, int offset) {
       this.ParentExists(mergeStmt);
+    }
+
+    void IVisitor.VisitOnOn(InsertStmt insertStmt, int offset) {
+      this.ParentExists(insertStmt);
     }
 
     void IVisitor.VisitOnOperator(BinaryOpExpr expr) {
@@ -796,6 +804,10 @@ namespace Tester
 
     void IVisitor.VisitOnWhere(UpdateStmt updateStmt, int offset) {
       this.ParentExists(updateStmt);
+    }
+
+    void IVisitor.VisitOnWhere(InsertStmt insertStmt, int offset) {
+      this.ParentExists(insertStmt);
     }
 
     void IVisitor.VisitOnWhere(SingleQueryClause queryClause, int offset) {

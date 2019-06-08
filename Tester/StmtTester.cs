@@ -449,6 +449,93 @@ namespace Tester
     }
 
     [Test]
+    public void PostgreSqlUpsert() {
+      Assert.That(parse("insert into T(id, name) values (1, 'abc') "
+                      + "on conflict (id, name) "
+                      + "do update set id=id+1, name='def' where id=1")
+           , Is.EqualTo("INSERT INTO T(id,name) VALUES(1,'abc') "
+                      + "ON CONFLICT(id,name) "
+                      + "DO UPDATE SET id=id+1,name='def' WHERE id=1"));
+
+      Assert.That(parse("insert T(id, name) values (1, 'abc') "
+                      + "on constraint id_constraint "
+                      + "do update set id=id+1")
+           , Is.EqualTo("INSERT T(id,name) VALUES(1,'abc') "
+                      + "ON CONSTRAINT id_constraint "
+                      + "DO UPDATE SET id=id+1"));
+
+      Assert.That(parse("insert T(id) values (1) "
+                      + "on conflict (id) "
+                      + "do nothing")
+     , Is.EqualTo("INSERT T(id) VALUES(1) "
+                      + "ON CONFLICT(id) "
+                      + "DO NOTHING"));
+
+      Assert.That(parse("insert into T(id, name) select * from T "
+                      + "on conflict (id, name) "
+                      + "do update set id=id+1, name='def' where id=1")
+           , Is.EqualTo("INSERT INTO T(id,name) SELECT * FROM T "
+                      + "ON CONFLICT(id,name) "
+                      + "DO UPDATE SET id=id+1,name='def' WHERE id=1"));
+
+      Assert.That(parse("insert T(id, name) select * from T "
+                      + "on constraint id_constraint "
+                      + "do update set id=id+1")
+           , Is.EqualTo("INSERT T(id,name) SELECT * FROM T "
+                      + "ON CONSTRAINT id_constraint "
+                      + "DO UPDATE SET id=id+1"));
+
+      Assert.That(parse("insert T(id) select * from T "
+                      + "on conflict (id) "
+                      + "do nothing")
+     , Is.EqualTo("INSERT T(id) SELECT * FROM T "
+                      + "ON CONFLICT(id) "
+                      + "DO NOTHING"));
+
+      Assert.That(parse("insert/*1*/ into/*2*/ T/*3*/(/*4*/id/*5*/,/*6*/ name/*7*/)/*8*/ values/*9*/ (/*10*/1/*11*/,/*12*/ 'abc'/*13*/)/*14*/ "
+                      + "on/*15*/ conflict/*16*/ (/*17*/id/*18*/,/*19*/ name/*20*/)/*21*/ "
+                      + "do/*22*/ update/*23*/ set/*24*/ id/*25*/=/*26*/id/*27*/+/*28*/1/*29*/,/*30*/ name/*31*/=/*32*/'def'/*33*/ where/*34*/ id/*35*/=/*36*/1/*37*/")
+           , Is.EqualTo("INSERT/*1*/ INTO/*2*/ T/*3*/(/*4*/id/*5*/,/*6*/name/*7*/)/*8*/ VALUES/*9*/(/*10*/1/*11*/,/*12*/'abc'/*13*/)/*14*/ "
+                      + "ON/*15*/ CONFLICT/*16*/(/*17*/id/*18*/,/*19*/name/*20*/)/*21*/ "
+                      + "DO/*22*/ UPDATE/*23*/ SET/*24*/ id/*25*/=/*26*/id/*27*/+/*28*/1/*29*/,/*30*/name/*31*/=/*32*/'def'/*33*/ WHERE/*34*/ id/*35*/=/*36*/1/*37*/"));
+
+      Assert.That(parse("insert/*1*/ T/*2*/(/*3*/id/*4*/,/*5*/ name/*6*/)/*7*/ values/*8*/ (/*9*/1/*10*/,/*11*/ 'abc'/*12*/)/*13*/ "
+                      + "on/*14*/ constraint/*15*/ id_constraint/*16*/ "
+                      + "do/*17*/ update/*18*/ set/*19*/ id/*20*/=/*21*/id/*22*/+/*23*/1/*24*/")
+           , Is.EqualTo("INSERT/*1*/ T/*2*/(/*3*/id/*4*/,/*5*/name/*6*/)/*7*/ VALUES/*8*/(/*9*/1/*10*/,/*11*/'abc'/*12*/)/*13*/ "
+                      + "ON/*14*/ CONSTRAINT/*15*/ id_constraint/*16*/ "
+                      + "DO/*17*/ UPDATE/*18*/ SET/*19*/ id/*20*/=/*21*/id/*22*/+/*23*/1/*24*/"));
+
+      Assert.That(parse("insert/*1*/ T/*2*/(/*3*/id/*4*/)/*5*/ values/*6*/ (/*7*/1/*8*/)/*9*/ "
+                      + "on/*10*/ conflict/*11*/ (/*12*/id/*13*/)/*14*/ "
+                      + "do/*15*/ nothing/*16*/")
+     , Is.EqualTo("INSERT/*1*/ T/*2*/(/*3*/id/*4*/)/*5*/ VALUES/*6*/(/*7*/1/*8*/)/*9*/ "
+                      + "ON/*10*/ CONFLICT/*11*/(/*12*/id/*13*/)/*14*/ "
+                      + "DO/*15*/ NOTHING/*16*/"));
+
+      Assert.That(parse("insert/*1*/ into/*2*/ T/*3*/(/*4*/id/*5*/,/*6*/ name/*7*/)/*8*/ select/*9*/ */*10*/ from/*11*/ T/*12*/ "
+                      + "on/*13*/ conflict/*14*/ (/*15*/id/*16*/,/*17*/ name/*18*/)/*19*/ "
+                      + "do/*20*/ update/*21*/ set/*22*/ id/*23*/=/*24*/id/*25*/+/*26*/1/*27*/,/*28*/ name/*29*/=/*30*/'def'/*31*/ where/*32*/ id/*33*/=/*34*/1/*35*/")
+           , Is.EqualTo("INSERT/*1*/ INTO/*2*/ T/*3*/(/*4*/id/*5*/,/*6*/name/*7*/)/*8*/ SELECT/*9*/ */*10*/ FROM/*11*/ T/*12*/ "
+                      + "ON/*13*/ CONFLICT/*14*/(/*15*/id/*16*/,/*17*/name/*18*/)/*19*/ "
+                      + "DO/*20*/ UPDATE/*21*/ SET/*22*/ id/*23*/=/*24*/id/*25*/+/*26*/1/*27*/,/*28*/name/*29*/=/*30*/'def'/*31*/ WHERE/*32*/ id/*33*/=/*34*/1/*35*/"));
+
+      Assert.That(parse("insert/*1*/ T/*2*/(/*3*/id/*4*/,/*5*/ name/*6*/)/*7*/ select/*8*/ */*9*/ from/*10*/ T/*11*/ "
+                      + "on/*12*/ constraint/*13*/ id_constraint/*14*/ "
+                      + "do/*15*/ update/*16*/ set/*17*/ id/*18*/=/*19*/id/*20*/+/*21*/1/*22*/")
+           , Is.EqualTo("INSERT/*1*/ T/*2*/(/*3*/id/*4*/,/*5*/name/*6*/)/*7*/ SELECT/*8*/ */*9*/ FROM/*10*/ T/*11*/ "
+                      + "ON/*12*/ CONSTRAINT/*13*/ id_constraint/*14*/ "
+                      + "DO/*15*/ UPDATE/*16*/ SET/*17*/ id/*18*/=/*19*/id/*20*/+/*21*/1/*22*/"));
+
+      Assert.That(parse("insert/*1*/ T/*2*/(/*3*/id/*4*/)/*5*/ select/*6*/ */*7*/ from/*8*/ T/*9*/ "
+                      + "on/*10*/ conflict/*11*/ (/*12*/id/*13*/)/*14*/ "
+                      + "do/*15*/ nothing/*16*/")
+           , Is.EqualTo("INSERT/*1*/ T/*2*/(/*3*/id/*4*/)/*5*/ SELECT/*6*/ */*7*/ FROM/*8*/ T/*9*/ "
+                      + "ON/*10*/ CONFLICT/*11*/(/*12*/id/*13*/)/*14*/ "
+                      + "DO/*15*/ NOTHING/*16*/"));
+    }
+
+    [Test]
     public void StmtSeparatorTest() {
       Assert.That(parse(";/*1*/select * from T/*2*/;/*3*/;/*4*/update U set a= 1/*5*/"
                       + ";/*6*/;/*7*/;/*8*/insert into V values(1)/*9*/;/*10*/;/*11*/;/*12*/;/*13*/")
